@@ -26,7 +26,7 @@ export default function HomeScreen() {
   worckOutMain: false
 }); 
 // Добавляем состояния для сохранения выобранного уровня
-  const [workoutLevel, setWorkoutLevel] = useState(15); // Добавляем состояние для уровня
+  const [workoutLevel, setWorkoutLevel] = useState(14); // Добавляем состояние для уровня
 
 
 
@@ -54,10 +54,17 @@ export default function HomeScreen() {
 {/* влючаем компоненты */}
 {showComponents.sportSelect && <SportSelect />}
 {showComponents.worckOut && <WorckOut />}
-{showComponents.worckOutMain && <WorckOutMain />}
+{showComponents.worckOutMain && (
+  <WorckOutMain workoutLevel={workoutLevel} setWorkoutLevel={setWorkoutLevel} />
+)}
+
  
  {/* добавляем кнопку  */}
  <SelectLevel level={workoutLevel} setLevel={setWorkoutLevel}/>
+
+
+
+
       {/* underSector */}
     <View style={
       {borderRadius: 10, 

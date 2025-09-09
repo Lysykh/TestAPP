@@ -3,12 +3,15 @@ import React from 'react';
 import { Image, Text, View } from 'react-native';
 import CalcRun from './calculator/calc_run';
 // - Импортируем элеметы выбора
-import { useState } from 'react';
 
-const WorckOutMain = () => {
+interface WorckOutMainProps {
+  workoutLevel: number;
+  setWorkoutLevel: React.Dispatch<React.SetStateAction<number>>;
+}
 
-// Добавляем состояния для сохранения выобранного уровня
-  const [workoutLevel, setWorkoutLevel] = useState(15); // Добавляем состояние для уровня
+
+const WorckOutMain = ({ workoutLevel, setWorkoutLevel }: WorckOutMainProps) => {
+
 
 
   return (
@@ -26,7 +29,7 @@ const WorckOutMain = () => {
     >
       <Text>РАЗМИНКА</Text>
   
-            
+            <View><Text>{workoutLevel}</Text></View> 
        <View style={{ 
         borderWidth: 0, 
         height: 60,
@@ -264,6 +267,9 @@ const WorckOutMain = () => {
             {/* значения */}
             <View style={{ borderWidth: 0, borderColor: 'black', height: '100%' }}>   
                 <View style={{height:'100%', justifyContent: 'center' }}><Text> Отдых между подходами 3 минуты</Text></View>
+               
+
+
 
             </View>
              
