@@ -1,6 +1,7 @@
 // Импортируем необходимые компоненты и хуки из React и React Native
 import React, { useEffect, useState } from 'react';
 import { ImageBackground, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import styles from './styles'; // Импортируем стили
 
 // Создаем основной компонент с использованием function declaration
 function SportSelect() {
@@ -158,114 +159,67 @@ function SportSelect() {
 
   // Возвращаем JSX разметку компонента
   return (
-    <View style={{
-      borderRadius: 10, 
-      overflow: 'hidden',
-      backgroundColor: '#F2F2F2',
-      margin: 5,
-    }}>
+    <View style={styles.sportSelectContainer}>
       {/* Заголовок секции */}
-      <Text style={{ padding: 10, fontWeight: 'bold' }}>ВИД СПОРТА</Text>
+      <Text style={styles.sportSelectTitle}>ВИД СПОРТА</Text>
       
       {/* Основной контейнер для видов спорта с горизонтальной прокруткой */}
       <ScrollView 
         horizontal={true}
         showsHorizontalScrollIndicator={true}
-        style={{
-          backgroundColor: '#F2F2F2',
-        }}
-        contentContainerStyle={{
-          paddingHorizontal: 10,
-          paddingBottom: 20,
-        }}
+        style={styles.sportSelectScrollView}
+        contentContainerStyle={styles.sportSelectScrollContent}
       >
         {/* Иконка плавания */}
-        <TouchableOpacity onPress={handleSwimPress} style={{ marginRight: 10 }}>
+        <TouchableOpacity onPress={handleSwimPress} style={styles.sportItemTouchable}>
           <ImageBackground
             source={getSwimImage()}
-            style={{
-              width: 130,
-              height: 150,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 10,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+            style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={{ marginTop: 100 }}>Плавание {swimType}</Text>
+            <Text style={styles.sportItemText}>Плавание {swimType}</Text>
           </ImageBackground>
         </TouchableOpacity>
         
         {/* Иконка бега */}
-        <TouchableOpacity onPress={handleRunPress} style={{ marginRight: 10 }}>
+        <TouchableOpacity onPress={handleRunPress} style={styles.sportItemTouchable}>
           <ImageBackground
             source={getRunImage()}
-            style={{
-              width: 130,
-              height: 150,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 10,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+            style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={{ marginTop: 100 }}>Бег {runType}</Text>
+            <Text style={styles.sportItemText}>Бег {runType}</Text>
           </ImageBackground>
         </TouchableOpacity>
         
         {/* Иконка велоспорта */}
-        <TouchableOpacity onPress={handleBikePress} style={{ marginRight: 10 }}>
+        <TouchableOpacity onPress={handleBikePress} style={styles.sportItemTouchable}>
           <ImageBackground
             source={getBikeImage()}
-            style={{
-              width: 130,
-              height: 150,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 10,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+            style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={{ marginTop: 100 }}>Велосипед {bikeType}</Text>
+            <Text style={styles.sportItemText}>Велосипед {bikeType}</Text>
           </ImageBackground>
         </TouchableOpacity>
 
         {/* Дополнительные элементы для демонстрации прокрутки */}
-        <View style={{
-          width: 130,
-          height: 150,
-          backgroundColor: '#FFFFFF',
-          borderRadius: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginRight: 10
-        }}>
+        <View style={styles.sportItemContainer}>
           <Text>Дополнительный вид спорта 1</Text>
         </View>
         
-        <View style={{
-          width: 130,
-          height: 150,
-          backgroundColor: '#FFFFFF',
-          borderRadius: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginRight: 10
-        }}>
+        <View style={styles.sportItemContainer}>
           <Text>Дополнительный вид спорта 2</Text>
         </View>
       </ScrollView>
       
       {/* Отображение выбранного вида спорта и цвета */}
-      <Text style={{ padding: 10, fontStyle: 'italic' }}>
+      <Text style={styles.sportSelectionInfo}>
         Выбран: {selectedSport ? getSportName(selectedSport) : 'ничего'}{selectedColor ? `, цвет: ${getColorName(selectedColor)}` : ''}
       </Text>
       
       {/* Отображение финальных значений на английском (для отладки) */}
-      <Text style={{ padding: 10, fontStyle: 'italic', fontSize: 12, color: 'gray' }}>
+      <Text style={styles.sportFinalValues}>
         Final values: Sport={SportTypeFinal || 'null'}, Color={ColorTypeFinal || 'null'}
       </Text>
     </View>
