@@ -1,5 +1,3 @@
-
-
 // НОВЫЕ ИМПОРТЫ
 // компонент для работы UseState - в частности для:
 // - состояния компонентов при кнопке
@@ -14,124 +12,63 @@ import SelectLevel from './SelectWorckoutLevel';
 import WorckOutMain from './WorckOutMain';
 import WorckOut from './WorckOutTop';
 // - импортирую стили 
-
+import styles from './styles';
 
 export default function HomeScreen() {
-
-
-// Добавляем состояния для показов и удаления компонентов в зависимости от кнопки
+  // Добавляем состояния для показов и удаления компонентов в зависимости от кнопки
   const [showComponents, setShowComponents] = useState({
-  sportSelect: true,
-  worckOut: false,
-  worckOutMain: false
-}); 
-// Добавляем состояния для сохранения выобранного уровня
-  const [workoutLevel, setWorkoutLevel] = useState(14); // Добавляем состояние для уровня
-
-
+    sportSelect: true,
+    worckOut: false,
+    worckOutMain: false
+  }); 
+  
+  // Добавляем состояния для сохранения выобранного уровня
+  const [workoutLevel, setWorkoutLevel] = useState(14);
 
   return (
-
-// ДОБАВЛЯЮ БАЗОВЫЙ КОНТЕЙНЕР И ПЕРВУЮ ВКЛАДКУ С ЛОГОТИПОМ ВНУТРИ КОНТЕЙНЕРА БУДУТ ОСТАЛЬНЫЕ ЭЛЕМЕНТЫ ВКЛЮЧАЯ СТАРЫЕ
-   <View style={{ backgroundColor: '#E7E7E7', flex: 1, overflowX: 'hidden'  }}>
-<View style={{ 
-  justifyContent: 'center', 
-  alignItems: 'flex-end', // Оставляем выравнивание по правому краю
-  marginHorizontal: 20,
-  paddingVertical: 10 // Добавляем отступы сверху и снизу
-}}>
-  <Image 
-    source={require('./logo.png')} 
-    style={{ 
-      width: 150, // Фиксированная ширина вместо процентов
-      height: 70, 
-      resizeMode: 'contain' // Используем resizeMode вместо objectFit
-    }}
-  />
-</View>
+    // ДОБАВЛЯЮ БАЗОВЫЙ КОНТЕЙНЕР И ПЕРВУЮ ВКЛАДКУ С ЛОГОТИПОМ ВНУТРИ КОНТЕЙНЕРА БУДУТ ОСТАЛЬНЫЕ ЭЛЕМЕНТЫ ВКЛЮЧАЯ СТАРЫЕ
+    <View style={styles.homeScreenContainer}>
+      <View style={styles.logoContainer}>
+        <Image 
+          source={require('./logo.png')} 
+          style={styles.logoImage}
+        />
+      </View>
    
+      {/* влючаем компоненты */}
+      {showComponents.sportSelect && <SportSelect />}
+      {showComponents.worckOut && <WorckOut />}
+      {showComponents.worckOutMain && (
+        <WorckOutMain workoutLevel={workoutLevel} setWorkoutLevel={setWorkoutLevel} />
+      )}
 
-{/* влючаем компоненты */}
-{showComponents.sportSelect && <SportSelect />}
-{showComponents.worckOut && <WorckOut />}
-{showComponents.worckOutMain && (
-  <WorckOutMain workoutLevel={workoutLevel} setWorkoutLevel={setWorkoutLevel} />
-)}
-
- 
- {/* добавляем кнопку  */}
- <SelectLevel level={workoutLevel} setLevel={setWorkoutLevel}/>
-
-
-
+      {/* добавляем кнопку  */}
+      <SelectLevel level={workoutLevel} setLevel={setWorkoutLevel}/>
 
       {/* underSector */}
-    <View style={
-      {borderRadius: 10, 
-        overflowX: 'hidden', // запрещает горизонтальную прокрутку
-        backgroundColor: '#F2F2F2',
-        margin:5,}
-        }>   
+      <View style={styles.underSector}>   
         {/* sectors */}
-      <View style={
-        {backgroundColor: '#F2F2F2',
-          overflow: 'scroll', //- разрешает горизонтальный скрол внутри 
-        }}>
+        <View style={styles.sectors}>
+          {/* buttomGO */}
+          <View style={styles.buttomGOContainer}>
+            <TouchableOpacity 
+              style={styles.buttomGO}
+              onPress={() => setShowComponents({
+                sportSelect: !showComponents.sportSelect,
+                worckOut: !showComponents.worckOut,
+                worckOutMain: !showComponents.worckOutMain
+              })}
+            >
+              <Text style={styles.buttomGOText}>СОЗДАТЬ ТРЕНИРОВКУ</Text>
+              <Text>Уровень + 2: {workoutLevel + 2}</Text>
+            </TouchableOpacity>
 
-        {/* buttomGO */}
-        <View style={{
-          paddingVertical: 10,   // отступ слева и справа для контейнера
-width: '100%',          // ширина квадрата
-height: 60,         // высота квадрата
-backgroundColor: '#DF9C00', // цвет фона
-borderRadius: 10,     // небольшой радиус для углов (опционально)
-
-        }
-          }>
-        
-<TouchableOpacity 
-// buttomGO
-  style={
-{
-          paddingVertical: 10,   // отступ слева и справа для контейнера
-width: '100%',          // ширина квадрата
-height: 60,         // высота квадрата
-backgroundColor: '#DF9C00', // цвет фона
-borderRadius: 10,     // небольшой радиус для углов (опционально)
-        }
-  }
-  onPress={() => setShowComponents({
-    sportSelect: !showComponents.sportSelect,
-    worckOut: !showComponents.worckOut,
-    worckOutMain: !showComponents.worckOutMain
-  })}
->
-            <Text style={{    fontSize: 15,
-    color: '#FFFFFF',
-    padding: 10,
-    alignSelf: 'center', // Центрирует по горизонтали
-    }}>СОЗДАТЬ ТРЕНИРОВКУ</Text>
             <Text>Уровень + 2: {workoutLevel + 2}</Text>
-          </TouchableOpacity>
-
-
-<Text>Уровень + 2: {workoutLevel + 2}</Text>
-
-
-
-
+          </View>
         </View>
-      
-      </View>
       </View>
 
-      
- <SelectSportLevel />
-
-
-
- </View>
-    
+      <SelectSportLevel />
+    </View>
   );
 }
-

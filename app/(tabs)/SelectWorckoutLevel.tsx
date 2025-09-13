@@ -109,25 +109,7 @@ justifyContent: 'center',  // центрирование по вертикали
 </Text>
             </View>
             
-            {/* Индикатор статуса (зеленая точка) */}
-            {/* <View style={{
-borderWidth: 0,          // Толщина рамки
-borderColor: '#000000',  // Чёрный цвет
-width: '100%',          // ширина квадрата
-height: 25,         // высота квадрата
-backgroundColor: '#FFFFFF', // цвет фона
-borderRadius: 10,     // небольшой радиус для углов (опционально)
-alignItems: 'center',      // центрирование по горизонтали
-justifyContent: 'center',  // центрирование по вертикали
 
-  }}>
-              <Image 
-                source={require('./dot_green.png')}
-                alt="Logo"
-                style={{ width: '20%', height: 70}}
-                resizeMode="contain"
-              />
-            </View> */}
           </View>
           
           {/* Блок кнопок управления уровнем */}

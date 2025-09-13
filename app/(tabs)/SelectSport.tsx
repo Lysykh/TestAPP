@@ -6,7 +6,7 @@ import styles from './styles'; // Импортируем стили
 // Создаем основной компонент с использованием function declaration
 function SportSelect() {
   // Состояния для хранения текущих типов изображений для каждого вида спорта
-  const [swimType, setSwimType] = useState('orange');
+  const [swimType, setSwimType] = useState('grey');
   const [runType, setRunType] = useState('grey');
   const [bikeType, setBikeType] = useState('grey');
   
@@ -36,12 +36,19 @@ function SportSelect() {
       case 'green':
         return 'red';
       case 'red':
-        return 'grey';
+        return 'orange'; // Возвращаем к оранжевому вместо серого
       case 'grey':
         return 'orange';
       default:
         return 'orange';
     }
+  };
+
+  // Функция для сброса всех невыбранных видов спорта к серому
+  const resetOtherSports = (selectedSport: string) => {
+    if (selectedSport !== 'swim') setSwimType('grey');
+    if (selectedSport !== 'run') setRunType('grey');
+    if (selectedSport !== 'bike') setBikeType('grey');
   };
 
   // Функция для получения русского названия цвета (только для отображения)
@@ -80,6 +87,7 @@ function SportSelect() {
     setSwimType(nextType);
     setSelectedSport('swim'); // Английское название для финальной переменной
     setSelectedColor(nextType); // Английское название цвета
+    resetOtherSports('swim'); // Сбрасываем другие виды спорта к серому
     console.log('sport: swim, swimType: ' + nextType);
   };
 
@@ -89,6 +97,7 @@ function SportSelect() {
     setRunType(nextType);
     setSelectedSport('run'); // Английское название для финальной переменной
     setSelectedColor(nextType); // Английское название цвета
+    resetOtherSports('run'); // Сбрасываем другие виды спорта к серому
     console.log('sport: run, runType: ' + nextType);
   };
 
@@ -98,6 +107,7 @@ function SportSelect() {
     setBikeType(nextType);
     setSelectedSport('bike'); // Английское название для финальной переменной
     setSelectedColor(nextType); // Английское название цвета
+    resetOtherSports('bike'); // Сбрасываем другие виды спорта к серому
     console.log('sport: bike, bikeType: ' + nextType);
   };
 
@@ -113,7 +123,7 @@ function SportSelect() {
       case 'grey':
         return require('./swim_grey.png');
       default:
-        return require('./swim_orange.png');
+        return require('./swim_grey.png');
     }
   };
 
@@ -177,7 +187,7 @@ function SportSelect() {
             style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={styles.sportItemText}>Плавание {swimType}</Text>
+            <Text style={styles.sportItemText}>Плавание</Text>
           </ImageBackground>
         </TouchableOpacity>
         
@@ -188,7 +198,7 @@ function SportSelect() {
             style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={styles.sportItemText}>Бег {runType}</Text>
+            <Text style={styles.sportItemText}>Бег</Text>
           </ImageBackground>
         </TouchableOpacity>
         
@@ -199,7 +209,7 @@ function SportSelect() {
             style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={styles.sportItemText}>Велосипед {bikeType}</Text>
+            <Text style={styles.sportItemText}>Велосипед</Text>
           </ImageBackground>
         </TouchableOpacity>
 

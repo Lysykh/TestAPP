@@ -1,33 +1,66 @@
 import { StyleSheet } from "react-native";
 
 export default styles = StyleSheet.create({
+  // Основные стили
   motherbox: {
     backgroundColor: '#E7E7E7',
     flex: 1,
-    overflowX: 'hidden', // запрещает горизонтальную прокрутку
+    overflowX: 'hidden',
+  },
+
+  // Стили для HomeScreen
+  homeScreenContainer: {
+    backgroundColor: '#E7E7E7', 
+    flex: 1, 
+    overflowX: 'hidden'
+  },
+
+  logoContainer: {
+    justifyContent: 'center', 
+    alignItems: 'flex-end',
+    marginHorizontal: 20,
+    paddingVertical: 10
+  },
+
+  logoImage: {
+    width: 150,
+    height: 70, 
+    resizeMode: 'contain'
   },
 
   underSector: {
     borderRadius: 10, 
-    overflowX: 'hidden', // запрещает горизонтальную прокрутку
+    overflowX: 'hidden',
     backgroundColor: '#F2F2F2',
-    borderRadius: 10, 
     margin: 5,
   },
 
   sectors: {
     backgroundColor: '#F2F2F2',
-    overflow: 'scroll', //- разрешает горизонтальный скрол внутри 
+    overflow: 'scroll',
   },
 
-  // субсектор прокручивается по горизонтали внутри сетора вместе с боксами
-  subsectors: { 
-    backgroundColor: '#F2F2F2',
-    flexDirection: 'row',   // располагаем элементы в линию
-    paddingHorizontal: 10,   // отступ слева и справа для контейнера
-    borderRadius: 10, 
-    padding: 20,
-    alignItems: 'center',
+  buttomGOContainer: {
+    paddingVertical: 10,
+    width: '100%',
+    height: 60,
+    backgroundColor: '#DF9C00',
+    borderRadius: 10,
+  },
+
+  buttomGO: {
+    paddingVertical: 10,
+    width: '100%',
+    height: 60,
+    backgroundColor: '#DF9C00',
+    borderRadius: 10,
+  },
+
+  buttomGOText: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    padding: 10,
+    alignSelf: 'center',
   },
 
   // Стили для компонента выбора спорта
@@ -85,33 +118,43 @@ export default styles = StyleSheet.create({
     color: 'gray',
   },
 
+  // Дополнительные стили (если есть)
+  subsectors: { 
+    backgroundColor: '#F2F2F2',
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    borderRadius: 10, 
+    padding: 20,
+    alignItems: 'center',
+  },
+
   spotrbox: {
-    width: 130,          // ширина квадрата
-    height: 150,         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
-    marginHorizontal: 10, // расстояние между элементами по горизонтали
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
+    width: 130,
+    height: 150,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 10,
+    borderRadius: 10,
   },
 
   levelbox: {
-    width: 70,          // ширина квадрата
-    height: 70,         // высота квадрата
-    backgroundColor: '#E5E5E5', // цвет фона
-    marginHorizontal: 10, // расстояние между элементами по горизонтали
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
-    elevation: 3,              // тень на Android
-    shadowColor: '#000',       // тень на iOS
-    shadowOffset: { width: 0, height: 2 },  // смещение тени
-    shadowOpacity: 0.2,        // прозрачность
-    shadowRadius: 4,           // размытие
+    width: 70,
+    height: 70,
+    backgroundColor: '#E5E5E5',
+    marginHorizontal: 10,
+    borderRadius: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 
   typebox: {
-    width: 110,          // ширина квадрата
-    height: 100,         // высота квадрата
-    backgroundColor: '#E5E5E5', // цвет фона
-    marginHorizontal: 10, // расстояние между элементами по горизонтали
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
+    width: 110,
+    height: 100,
+    backgroundColor: '#E5E5E5',
+    marginHorizontal: 10,
+    borderRadius: 10,
   },
 
   container: {
@@ -131,19 +174,19 @@ export default styles = StyleSheet.create({
     fontSize: 15,
     color: '#FFFFFF',
     padding: 10,
-    alignSelf: 'center', // Центрирует по горизонтали
+    alignSelf: 'center',
   },
 
   levelDisplay: {
-    width: 200,          // ширина квадрата
-    height: 150,         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
-    alignItems: 'center',      // центрирование по горизонтали
-    justifyContent: 'center',  // центрирование по вертикали
-    flexDirection: 'column', // Вертикальное расположение (можно опустить, т.к. это значение по умолчанию)
-    borderWidth: 0,          // Толщина рамки
-    borderColor: '#000000',  // Чёрный цвет 
+    width: 200,
+    height: 150,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    borderWidth: 0,
+    borderColor: '#000000',
   },
 
   selectedBox: {
@@ -151,108 +194,100 @@ export default styles = StyleSheet.create({
   },
 
   levelDisplayText: {
-    borderWidth: 0,          // Толщина рамки
-    borderColor: '#000000',  // Чёрный цвет
-    width: '100%',          // ширина квадрата
-    height: 25,         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
+    borderWidth: 0,
+    borderColor: '#000000',
+    width: '100%',
+    height: 25,
+    backgroundColor: '#FFFFFF',
     fontSize: 15,
     color: '#333',
-    alignItems: 'right',      // центрирование по горизонтали
-    justifyContent: 'center',  // центрирование по вертикали
+    alignItems: 'right',
+    justifyContent: 'center',
   },
 
   levelDisplayMain: {
-    borderWidth: 0,          // Толщина рамки
-    borderColor: '#000000',  // Чёрный цвет
-    width: '100%',          // ширина квадрата
-    height: 100,         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
-    alignItems: 'center',      // центрирование по горизонтали
-    justifyContent: 'center',  // центрирование по вертикали
+    borderWidth: 0,
+    borderColor: '#000000',
+    width: '100%',
+    height: 100,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   
   levelDisplayMainText: {
-    borderWidth: 0,          // Толщина рамки
-    borderColor: '#000000',  // Чёрный цвет
+    borderWidth: 0,
+    borderColor: '#000000',
     fontSize: 25,
     color: '#333',
   },
 
   levelDisplayStatus: {
-    borderWidth: 0,          // Толщина рамки
-    borderColor: '#000000',  // Чёрный цвет
-    width: '100%',          // ширина квадрата
-    height: 25,         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
-    alignItems: 'center',      // центрирование по горизонтали
-    justifyContent: 'center',  // центрирование по вертикали
+    borderWidth: 0,
+    borderColor: '#000000',
+    width: '100%',
+    height: 25,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   WorckOutTop: {
-    width: 'auto',          // ширина квадрата
-    height: 100,         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
-    alignItems: 'center',      // центрирование по горизонтали
-    justifyContent: 'center',  // центрирование по вертикали
-    flexDirection: 'column', // Вертикальное расположение (можно опустить, т.к. это значение по умолчанию)
-    borderWidth: 0,          // Толщина рамки
-    borderColor: '#000000',  // Чёрный цвет 
+    width: 'auto',
+    height: 100,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    borderWidth: 0,
+    borderColor: '#000000',
   },
 
   WorckOutMain: {
-    width: 'auto',          // ширина квадрата
-    height: 'auto',         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
-    alignItems: 'center',      // центрирование по горизонтали
-    justifyContent: 'center',  // центрирование по вертикали
-    flexDirection: 'column', // Вертикальное расположение (можно опустить, т.к. это значение по умолчанию)
-    borderWidth: 0,          // Толщина рамки
-    borderColor: '#000000',  // Чёрный цвет 
+    width: 'auto',
+    height: 'auto',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    borderWidth: 0,
+    borderColor: '#000000',
   },
 
   buttomBox: {
-    width: 200,          // ширина квадрата
-    height: 200,         // высота квадрата
-    backgroundColor: '#F2F2F2', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
-    alignItems: 'center',      // центрирование по горизонтали
-    justifyContent: 'center',  // центрирование по вертикали
+    width: 200,
+    height: 200,
+    backgroundColor: '#F2F2F2',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   
   buttomUp: {
-    paddingVertical: 10,   // отступ слева и справа для контейнера
-    width: 150,          // ширина квадрата
-    height: 60,         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
+    paddingVertical: 10,
+    width: 150,
+    height: 60,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
     margin: 10,
   },
   
   buttomDown: {
-    paddingVertical: 10,   // отступ слева и справа для контейнера
-    width: 150,          // ширина квадрата
-    height: 60,         // высота квадрата
-    backgroundColor: '#FFFFFF', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
+    paddingVertical: 10,
+    width: 150,
+    height: 60,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
     margin: 10,
   },
   
-  buttomGO: {
-    paddingVertical: 10,   // отступ слева и справа для контейнера
-    width: '100%',          // ширина квадрата
-    height: 60,         // высота квадрата
-    backgroundColor: '#DF9C00', // цвет фона
-    borderRadius: 10,     // небольшой радиус для углов (опционально)
-  },
-
   backgroundImage: {
-    width: '70%', // Размер изображения — 50% от контейнера
+    width: '70%',
     height: '70%',
-    alignSelf: 'center', // Центрирует по горизонтали
+    alignSelf: 'center',
   },
 });
