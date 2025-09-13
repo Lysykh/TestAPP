@@ -290,4 +290,121 @@ export default styles = StyleSheet.create({
     height: '70%',
     alignSelf: 'center',
   },
+
+  // Стили для WorckOutMain
+  worckOutMainContainer: {
+    borderWidth: 0, 
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 0,
+  },
+
+  workoutSectionTitle: {
+    padding: 10,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  workoutLevelDisplay: {
+    padding: 10,
+  },
+
+  workoutRow: {
+    height: 60,
+    padding: 8,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+
+  tagRow: {
+    height: 30,
+    padding: 8,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+
+  stick: {
+    width: 4,
+    height: '100%', 
+    borderRadius: 2,
+    marginRight: 8,
+  },
+
+  grayStick: {
+    backgroundColor: '#BFBFBF',
+  },
+
+  whiteStick: {
+    backgroundColor: 'white',
+  },
+
+  goldenStick: {
+    backgroundColor: '#D89738',
+    marginLeft: 32,
+  },
+
+  beigeStick: {
+    backgroundColor: '#E0C491',
+    marginLeft: 32,
+  },
+
+  lightGrayStick: {
+    backgroundColor: '#E7E7E7',
+    marginLeft: 12,
+  },
+
+  iconsColumn: {
+    width: 24,
+    height: '100%',
+    justifyContent: 'space-between',
+    marginRight: 8,
+  },
+
+  iconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 24,
+  },
+
+  valuesColumn: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'space-between',
+  },
+
+  valueText: {
+    fontSize: 14,
+  },
+
+  singleIconContainer: {
+    width: 24,
+    height: '100%',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+
+  singleValueContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  smallIcon: {
+    width: 15, 
+    height: 15
+  },
+
+  mediumIcon: {
+    width: 20, 
+    height: 20
+  },
+
+  // Для строк с одной иконкой
+  tagContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  }
+
+
 });
+
