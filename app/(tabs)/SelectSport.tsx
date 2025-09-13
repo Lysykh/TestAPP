@@ -3,8 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { ImageBackground, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import styles from './styles'; // Импортируем стили
 
+// Определяем интерфейс для пропсов
+interface SportSelectProps {
+  onSportChange: (sport: string | null) => void;
+  onColorChange: (color: string | null) => void;
+}
+
 // Создаем основной компонент с использованием function declaration
-function SportSelect() {
+function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
   // Состояния для хранения текущих типов изображений для каждого вида спорта
   const [swimType, setSwimType] = useState('grey');
   const [runType, setRunType] = useState('grey');
@@ -24,9 +30,13 @@ function SportSelect() {
     setColorTypeFinal(selectedColor);
     setSportTypeFinal(selectedSport);
     
+    // Передаем значения родительскому компоненту
+    onSportChange(selectedSport);
+    onColorChange(selectedColor);
+    
     // Логирование финальных значений для отладки
     console.log('FINAL VALUES - Sport:', SportTypeFinal, 'Color:', ColorTypeFinal);
-  }, [selectedSport, selectedColor]);
+  }, [selectedSport, selectedColor, onSportChange, onColorChange]);
 
   // Функция для получения следующего типа иконки на основе текущего
   const getNextType = (currentType: string): string => {

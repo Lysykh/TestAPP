@@ -25,6 +25,10 @@ export default function HomeScreen() {
   // Добавляем состояния для сохранения выобранного уровня
   const [workoutLevel, setWorkoutLevel] = useState(14);
 
+  // Добавляем состояния для хранения выбранного спорта и цвета
+  const [selectedSport, setSelectedSport] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+
   return (
     // ДОБАВЛЯЮ БАЗОВЫЙ КОНТЕЙНЕР И ПЕРВУЮ ВКЛАДКУ С ЛОГОТИПОМ ВНУТРИ КОНТЕЙНЕРА БУДУТ ОСТАЛЬНЫЕ ЭЛЕМЕНТЫ ВКЛЮЧАЯ СТАРЫЕ
     <View style={styles.homeScreenContainer}>
@@ -36,10 +40,20 @@ export default function HomeScreen() {
       </View>
    
       {/* влючаем компоненты */}
-      {showComponents.sportSelect && <SportSelect />}
+      {showComponents.sportSelect && (
+        <SportSelect 
+          onSportChange={setSelectedSport}
+          onColorChange={setSelectedColor}
+        />
+      )}
       {showComponents.worckOut && <WorckOut />}
       {showComponents.worckOutMain && (
-        <WorckOutMain workoutLevel={workoutLevel} setWorkoutLevel={setWorkoutLevel} />
+        <WorckOutMain 
+          workoutLevel={workoutLevel} 
+          setWorkoutLevel={setWorkoutLevel}
+          sportType={selectedSport}
+          colorType={selectedColor}
+        />
       )}
 
       {/* добавляем кнопку  */}

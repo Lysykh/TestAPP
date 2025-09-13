@@ -6,15 +6,55 @@ import styles from './styles';
 interface WorckOutMainProps {
   workoutLevel: number;
   setWorkoutLevel: React.Dispatch<React.SetStateAction<number>>;
+  sportType: string | null;
+  colorType: string | null;
 }
 
-const WorckOutMain = ({ workoutLevel, setWorkoutLevel }: WorckOutMainProps) => {
+const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: WorckOutMainProps) => {
+  
+  // Функция для получения русского названия спорта
+  const getSportName = (sport: string | null): string => {
+    if (!sport) return 'не выбран';
+    switch (sport) {
+      case 'swim':
+        return 'плавание';
+      case 'run':
+        return 'бег';
+      case 'bike':
+        return 'велосипед';
+      default:
+        return sport;
+    }
+  };
+
+  // Функция для получения русского названия цвета
+  const getColorName = (color: string | null): string => {
+    if (!color) return 'не выбран';
+    switch (color) {
+      case 'orange':
+        return 'оранжевый';
+      case 'green':
+        return 'зеленый';
+      case 'red':
+        return 'красный';
+      case 'grey':
+        return 'серый';
+      default:
+        return color;
+    }
+  };
+
   return (
     <View style={styles.worckOutMainContainer}>
       <Text style={styles.workoutSectionTitle}>РАЗМИНКА</Text>
   
       <View style={styles.workoutLevelDisplay}>
         <Text>Уровень: {workoutLevel}</Text>
+        <Text>Спорт: {getSportName(sportType)}</Text>
+        <Text>Цвет: {getColorName(colorType)}</Text>
+        {sportType && colorType && (
+          <Text>Идентификатор: {sportType}_{colorType}</Text>
+        )}
       </View> 
       
       <View style={styles.workoutRow}>
