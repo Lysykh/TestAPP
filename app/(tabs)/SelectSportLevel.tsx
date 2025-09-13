@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-const SelectSportLevel = () => {
+interface SelectSportLevelProps {
+  onTimeChange: (time: string | null) => void;
+}
+
+const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange }) => {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedBox, setSelectedBox] = useState<number | null>(null);
 
@@ -10,10 +14,10 @@ const SelectSportLevel = () => {
   const handleBoxPress = (index: number, time: string) => {
     setSelectedBox(index);
     setSelectedTime(time);
+    onTimeChange(time);
   };
 
   return (
-    // undersector
     <View style={{
       borderRadius: 10, 
       overflow: 'hidden',
@@ -22,7 +26,6 @@ const SelectSportLevel = () => {
     }}>
       <Text style={{ padding: 10, fontWeight: 'bold' }}>ТВОЙ СПОРТИВНЫЙ УРОВЕНЬ</Text>
       
-      {/* Заменяем View на ScrollView для горизонтальной прокрутки */}
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={true}
@@ -42,7 +45,7 @@ const SelectSportLevel = () => {
                 width: 70,
                 height: 70,
                 backgroundColor: '#E5E5E5',
-                marginRight: 10, // используем marginRight вместо marginHorizontal
+                marginRight: 10,
                 borderRadius: 10,
                 elevation: 3,
                 shadowColor: '#000',

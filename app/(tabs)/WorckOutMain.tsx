@@ -8,11 +8,17 @@ interface WorckOutMainProps {
   setWorkoutLevel: React.Dispatch<React.SetStateAction<number>>;
   sportType: string | null;
   colorType: string | null;
+  selectedTime: string | null;
 }
 
-const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: WorckOutMainProps) => {
+const WorckOutMain = ({ 
+  workoutLevel, 
+  setWorkoutLevel, 
+  sportType, 
+  colorType, 
+  selectedTime 
+}: WorckOutMainProps) => {
   
-  // Функция для получения русского названия спорта
   const getSportName = (sport: string | null): string => {
     if (!sport) return 'не выбран';
     switch (sport) {
@@ -27,7 +33,6 @@ const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: W
     }
   };
 
-  // Функция для получения русского названия цвета
   const getColorName = (color: string | null): string => {
     if (!color) return 'не выбран';
     switch (color) {
@@ -52,6 +57,7 @@ const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: W
         <Text>Уровень: {workoutLevel}</Text>
         <Text>Спорт: {getSportName(sportType)}</Text>
         <Text>Цвет: {getColorName(colorType)}</Text>
+        <Text>Время на 100м: {selectedTime || 'не выбрано'}</Text>
         {sportType && colorType && (
           <Text>Идентификатор: {sportType}_{colorType}</Text>
         )}
@@ -83,7 +89,6 @@ const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: W
 
       <Text style={styles.workoutSectionTitle}>ОСНОВНОЕ ЗАДАНИЕ</Text>
       
-      {/* ПОДХОДЫ */}
       <View style={styles.tagRow}>
         <View style={[styles.stick, styles.whiteStick]} />
         
@@ -99,7 +104,6 @@ const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: W
         </View>
       </View> 
 
-      {/* ПОВТОРЕНИЯ */}
       <View style={styles.tagRow}>
         <View style={[styles.stick, styles.whiteStick]} />
         
@@ -115,7 +119,6 @@ const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: W
         </View>
       </View> 
 
-      {/* УПРАЖНЕНИЕ 1 */}
       <View style={styles.workoutRow}>
         <View style={[styles.stick, styles.goldenStick]} />
         
@@ -140,7 +143,6 @@ const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: W
         </View>
       </View> 
 
-      {/* УПРАЖНЕНИЕ 2 */}
       <View style={styles.workoutRow}>
         <View style={[styles.stick, styles.beigeStick]} />
         
@@ -165,7 +167,6 @@ const WorckOutMain = ({ workoutLevel, setWorkoutLevel, sportType, colorType }: W
         </View>
       </View> 
 
-      {/* ОТДЫХ */}
       <View style={styles.tagRow}>
         <View style={[styles.stick, styles.lightGrayStick]} />
         
