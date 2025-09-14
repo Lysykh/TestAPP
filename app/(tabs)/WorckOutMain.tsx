@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import CalcRun from './calculator/calc_run';
+import { secondsToTimeString } from './SelectSportLevel';
 import styles from './styles';
 
 interface WorckOutMainProps {
@@ -8,7 +9,7 @@ interface WorckOutMainProps {
   setWorkoutLevel: React.Dispatch<React.SetStateAction<number>>;
   sportType: string | null;
   colorType: string | null;
-  selectedTime: string | null;
+  selectedTimeSeconds: number | null;
 }
 
 const WorckOutMain = ({ 
@@ -16,7 +17,7 @@ const WorckOutMain = ({
   setWorkoutLevel, 
   sportType, 
   colorType, 
-  selectedTime 
+  selectedTimeSeconds 
 }: WorckOutMainProps) => {
   
   const getSportName = (sport: string | null): string => {
@@ -49,6 +50,11 @@ const WorckOutMain = ({
     }
   };
 
+  // Расчет времени: выбранное время + 40 секунд + 70 секунд
+  const RaschetBeg = selectedTimeSeconds !== null 
+    ? selectedTimeSeconds + 40 + 70 
+    : null;
+
   return (
     <View style={styles.worckOutMainContainer}>
       <Text style={styles.workoutSectionTitle}>РАЗМИНКА</Text>
@@ -57,7 +63,15 @@ const WorckOutMain = ({
         <Text>Уровень: {workoutLevel}</Text>
         <Text>Спорт: {getSportName(sportType)}</Text>
         <Text>Цвет: {getColorName(colorType)}</Text>
-        <Text>Время на 100м: {selectedTime || 'не выбрано'}</Text>
+        <Text>Время на 100м: {selectedTimeSeconds !== null 
+          ? secondsToTimeString(selectedTimeSeconds) 
+          : 'не выбрано'
+        }</Text>
+        {RaschetBeg !== null && (
+          <Text>Расчет бега: {secondsToTimeString(RaschetBeg)} 
+            {"\n"}({secondsToTimeString(selectedTimeSeconds!)} + 40с + 70с)
+          </Text>
+        )}
         {sportType && colorType && (
           <Text>Идентификатор: {sportType}_{colorType}</Text>
         )}

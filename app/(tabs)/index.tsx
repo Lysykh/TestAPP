@@ -17,7 +17,7 @@ export default function HomeScreen() {
   const [workoutLevel, setWorkoutLevel] = useState(14);
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedTimeSeconds, setSelectedTimeSeconds] = useState<number | null>(null);
 
   return (
     <View style={styles.homeScreenContainer}>
@@ -41,7 +41,7 @@ export default function HomeScreen() {
           setWorkoutLevel={setWorkoutLevel}
           sportType={selectedSport}
           colorType={selectedColor}
-          selectedTime={selectedTime}
+          selectedTimeSeconds={selectedTimeSeconds}
         />
       )}
 
@@ -67,7 +67,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <SelectSportLevel onTimeChange={setSelectedTime} />
+      <SelectSportLevel onTimeChange={setSelectedTimeSeconds} />
     </View>
   );
 }
