@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import CalcRun from './calculator/calc_run';
+import createTrainingArray from './runCalc';
 import { secondsToTimeString } from './SelectSportLevel';
 import styles from './styles';
 
@@ -34,6 +35,8 @@ const WorckOutMain = ({
     }
   };
 
+let green1 = createTrainingArray(40,10,40);
+
   const getColorName = (color: string | null): string => {
     if (!color) return 'не выбран';
     switch (color) {
@@ -51,9 +54,13 @@ const WorckOutMain = ({
   };
 
   // Расчет времени: выбранное время + 40 секунд + 70 секунд
-  const RaschetBeg = selectedTimeSeconds !== null 
-    ? selectedTimeSeconds + 40 + 70 
-    : null;
+let RaschetBeg;
+if (selectedTimeSeconds !== null) {
+    RaschetBeg = selectedTimeSeconds + 40 + 70;
+} else {
+    RaschetBeg = null;
+}
+
 
   return (
     <View style={styles.worckOutMainContainer}>
@@ -63,6 +70,16 @@ const WorckOutMain = ({
         <Text>Уровень: {workoutLevel}</Text>
         <Text>Спорт: {getSportName(sportType)}</Text>
         <Text>Цвет: {getColorName(colorType)}</Text>
+
+<Text style={styles.valueText}>
+  {green1
+    .filter(item => item.id === 14) // Фильтруем только элемент с id = 14
+    .map(item => 
+      `ID: ${item.id}, Дистанция: ${item.distance}m, Темп: ${item.temp}s, Повторы: ${item.reps}, Подходы: ${item.sets}`
+    ).join('')}
+</Text>
+
+
         <Text>Время на 100м: {selectedTimeSeconds !== null 
           ? secondsToTimeString(selectedTimeSeconds) 
           : 'не выбрано'
@@ -74,6 +91,7 @@ const WorckOutMain = ({
         )}
         {sportType && colorType && (
           <Text>Идентификатор: {sportType}_{colorType}</Text>
+
         )}
       </View> 
       

@@ -7,6 +7,7 @@ import WorckOutMain from './WorckOutMain';
 import WorckOut from './WorckOutTop';
 import styles from './styles';
 
+
 export default function HomeScreen() {
   const [showComponents, setShowComponents] = useState({
     sportSelect: true,
@@ -17,6 +18,7 @@ export default function HomeScreen() {
   const [workoutLevel, setWorkoutLevel] = useState(14);
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedTimeSeconds, setSelectedTimeSeconds] = useState<number | null>(null);
 
   return (
@@ -41,7 +43,7 @@ export default function HomeScreen() {
           setWorkoutLevel={setWorkoutLevel}
           sportType={selectedSport}
           colorType={selectedColor}
-          selectedTimeSeconds={selectedTimeSeconds}
+          selectedTime={selectedTime}
         />
       )}
 
@@ -67,7 +69,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <SelectSportLevel onTimeChange={setSelectedTimeSeconds} />
+      <SelectSportLevel onTimeChange={setSelectedTime} />
     </View>
   );
 }
