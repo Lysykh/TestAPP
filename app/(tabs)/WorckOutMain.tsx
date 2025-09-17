@@ -11,6 +11,7 @@ interface WorckOutMainProps {
   sportType: string | null;
   colorType: string | null;
   selectedTimeSeconds: number | null;
+  
 }
 
 const WorckOutMain = ({ 
