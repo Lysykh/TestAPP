@@ -35,7 +35,7 @@ const WorckOutMain = ({
     }
   };
 
-let green1 = createTrainingArray(40,10,40);
+let green1 = createTrainingArray(workoutLevel);
 
   const getColorName = (color: string | null): string => {
     if (!color) return 'не выбран';
@@ -73,9 +73,9 @@ if (selectedTimeSeconds !== null) {
 
 <Text style={styles.valueText}>
   {green1
-    .filter(item => item.id === 14) // Фильтруем только элемент с id = 14
+    .filter(item => item.id === workoutLevel) // Фильтруем только элемент с id = 14
     .map(item => 
-      `ID: ${item.id}, Дистанция: ${item.distance}m, Темп: ${item.temp}s, Повторы: ${item.reps}, Подходы: ${item.sets}`
+      `ID: ${item.id}, Дистанция: ${item.distance}m, Темп: ${item.temp}s, Темп: ${item.temp}s, Повторы: ${item.reps}, Подходы: ${item.sets}`
     ).join('')}
 </Text>
 
