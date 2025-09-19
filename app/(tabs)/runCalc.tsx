@@ -7,7 +7,7 @@
 // 6. максимальное количество подходов 1
 // 7. зона работы Аэробная (105% к темпу) 
 // 8. количество повторений не больше 10
-// 9. количество подходов не более 3
+// 9. количество подходов не более 5
 
 		
 // ТЕМПОВЫЕ ЗОНЫ	НОРМА	минимум	максимум
@@ -40,32 +40,32 @@ export default function createTrainingArray(
   const trainingArray: RunLong[] = [];
   let idCounter = 1;
 
-  // Фиксированные значения
-  const sets = 3;
   const count = 40;
 
-  for (let reps = 1; reps <= 10; reps++) {
-    let distance = 800;
-    
-    for (let i = 0; i < count; i++) {
-      if (distance > 2400) {
-        break;
+  for (let sets = 1; sets <= 5; sets++) {
+    for (let reps = 1; reps <= 10; reps++) {
+      let distance = 800;
+      
+      for (let i = 0; i < count; i++) {
+        if (distance > 2400) {
+          break;
+        }
+        
+        trainingArray.push({
+          id: idCounter++,
+          distance: distance,
+          temp: temp,
+          reps: reps,
+          sets: sets,
+          minTemp: temp * 1.05,
+          maxTemp: temp,
+          relaxTemp: temp * 1.25,
+          relaxDistance: distance * 0.2,
+          totalDistance: distance * reps * sets,
+        });
+        
+        distance += 200;
       }
-      
-      trainingArray.push({
-        id: idCounter++,
-        distance: distance,
-        temp: temp,
-        reps: reps,
-        sets: sets,
-        minTemp: temp * 1.05,
-        maxTemp: temp,
-        relaxTemp: temp * 1.25,
-        relaxDistance: distance * 0.2,
-        totalDistance: distance * reps * sets,
-      });
-      
-      distance += 200;
     }
   }
 
