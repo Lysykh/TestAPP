@@ -1,3 +1,25 @@
+// описание калькулятора регулярный бег
+// 1. Ограничения дистанции от 800 до 2400 
+// 2. минимальная дистанция 3000 метров
+// 3. масимальная дистанция 10000 метров 
+// 4. отдых от 200 до 400 метров 
+// 5. максимальное количество повторов - до упора по ограничению в дистанцию
+// 6. максимальное количество подходов 1
+// 7. зона работы Аэробная (105% к темпу) 
+// 8. количество повторений не больше 10
+// 9. количество подходов не более 3
+
+		
+// ТЕМПОВЫЕ ЗОНЫ	НОРМА	минимум	максимум
+// 1	135%	трусца	08:16
+// ОТДЫХ 2	129%	08:16	07:54
+// ЛЕГКАЯ 3	113%	07:54	06:55
+// АЭРОБНАЯ 4	105%	06:55	06:26
+// ПАНО 5	100%	06:26	06:08
+// МПК 6	96%	06:08	05:53
+// АНАЭРОБ 7	90%	05:53	
+
+
 export type RunLong = {
   id: number;
   distance: number;
@@ -6,34 +28,46 @@ export type RunLong = {
   sets: number;
   minTemp: number | null;
   maxTemp: number | null;
+  relaxTemp: number | null;
+  relaxDistance: number | null;
+  totalDistance: number;
 };
 
 // Функция для создания массива тренировок с фиксированными значениями
 export default function createTrainingArray(
-  temp: number, 
+  temp: number,
 ): RunLong[] {
   const trainingArray: RunLong[] = [];
+  let idCounter = 1;
 
-  // Фиксированные значения для остальных параметров
-  let distance = 1000;
-  const reps = 2;
+  // Фиксированные значения
   const sets = 3;
   const count = 40;
 
-  for (let i = 0; i < count; i++) {
- 
-    trainingArray.push({
-      id: i + 1,
-      distance: distance,
-      temp: temp,
-      reps: reps,
-      sets: sets,
-      minTemp: temp * 0.9,
-      maxTemp: temp * 1,
-    });
-    distance += 1000;
+  for (let reps = 1; reps <= 10; reps++) {
+    let distance = 800;
+    
+    for (let i = 0; i < count; i++) {
+      if (distance > 2400) {
+        break;
+      }
+      
+      trainingArray.push({
+        id: idCounter++,
+        distance: distance,
+        temp: temp,
+        reps: reps,
+        sets: sets,
+        minTemp: temp * 1.05,
+        maxTemp: temp,
+        relaxTemp: temp * 1.25,
+        relaxDistance: distance * 0.2,
+        totalDistance: distance * reps * sets,
+      });
+      
+      distance += 200;
+    }
   }
 
   return trainingArray;
 }
-

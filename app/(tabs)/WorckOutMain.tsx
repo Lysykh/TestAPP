@@ -36,7 +36,7 @@ const WorckOutMain = ({
     }
   };
 
-let green1 = createTrainingArray(workoutLevel);
+let green1 = createTrainingArray(selectedTimeSeconds);
 
   const getColorName = (color: string | null): string => {
     if (!color) return 'не выбран';
@@ -62,7 +62,21 @@ if (selectedTimeSeconds !== null) {
     RaschetBeg = null;
 }
 
+// worckoutTemp - это переменная которая забирает отфильтрованное значение из массива green. Нафильтровать и сохранить можно было много. Пример ниже но я остановился на этом
 
+//   {green1
+//     .filter(item => item.id === workoutLevel) // Фильтруем только элемент с id = 14
+//     .map(item => 
+//       `ID: ${item.id}, Дистанция: ${item.distance}m, Темп: ${item.minTemp}s, Темп: ${item.maxTemp}s, Повторы: ${item.reps}, Подходы: ${item.sets}`
+//     ).join('')}
+
+let worckoutTemp = green1
+    .filter(item => item.id === workoutLevel) // Фильтруем только элемент с id = как WorckOutLevel
+    .map(item => 
+      `${item.minTemp}`
+    ).join('')
+
+    
   return (
     <View style={styles.worckOutMainContainer}>
       <Text style={styles.workoutSectionTitle}>РАЗМИНКА</Text>
@@ -76,7 +90,7 @@ if (selectedTimeSeconds !== null) {
   {green1
     .filter(item => item.id === workoutLevel) // Фильтруем только элемент с id = 14
     .map(item => 
-      `ID: ${item.id}, Дистанция: ${item.distance}m, Темп: ${item.temp}s, Темп: ${item.temp}s, Повторы: ${item.reps}, Подходы: ${item.sets}`
+      `ID: ${item.id}, Дистанция: ${item.distance}m, Темп: ${item.minTemp}s, Темп: ${item.maxTemp}s, Темп отдыха: ${item.relaxTemp}s, Повторы: ${item.reps}, Подходы: ${item.sets}, Всего дистанция: ${item.totalDistance}, Дистанция отдыха: ${item.relaxDistance}`
     ).join('')}
 </Text>
 
@@ -86,8 +100,8 @@ if (selectedTimeSeconds !== null) {
           : 'не выбрано'
         }</Text>
         {RaschetBeg !== null && (
-          <Text>Расчет бега: {secondsToTimeString(RaschetBeg)} 
-            {"\n"}({secondsToTimeString(selectedTimeSeconds!)} + 40с + 70с)
+          <Text>Расчет бега: {secondsToTimeString(worckoutTemp)} 
+            {"\n"}({secondsToTimeString(worckoutTemp!)} + 40с + 70с)
           </Text>
         )}
         {sportType && colorType && (
@@ -116,7 +130,8 @@ if (selectedTimeSeconds !== null) {
         
         <View style={styles.valuesColumn}>
           <Text style={styles.valueText}>8 : 15</Text>
-          <Text style={styles.valueText}>60 : 15</Text>
+          <Text style={styles.valueText}>Расчет бега: {secondsToTimeString(worckoutTemp)} 
+          </Text>
         </View>
       </View> 
 
