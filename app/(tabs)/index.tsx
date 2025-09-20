@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import SportSelect from './SelectSport';
 import SelectSportLevel from './SelectSportLevel';
 import SelectLevel from './SelectWorckoutLevel';
 import WorckOutMain from './WorckOutMain';
 import WorckOut from './WorckOutTop';
 import styles from './styles';
-
 
 export default function HomeScreen() {
   const [showComponents, setShowComponents] = useState({
@@ -29,25 +28,31 @@ export default function HomeScreen() {
         />
       </View>
    
-      {showComponents.sportSelect && (
-        <SportSelect 
-          onSportChange={setSelectedSport}
-          onColorChange={setSelectedColor}
-        />
-      )}
-      {showComponents.worckOut && <WorckOut />}
-      {showComponents.worckOutMain && (
-        <WorckOutMain 
-          workoutLevel={workoutLevel} 
-          setWorkoutLevel={setWorkoutLevel}
-          sportType={selectedSport}
-          colorType={selectedColor}
-          selectedTimeSeconds={selectedTimeSeconds}
-        />
-      )}
+      {/* Добавляем ScrollView для возможности прокрутки */}
+      <ScrollView style={styles.scrollContainer}>
+        {showComponents.sportSelect && (
+          <SportSelect 
+            onSportChange={setSelectedSport}
+            onColorChange={setSelectedColor}
+          />
+        )}
+        {showComponents.worckOut && <WorckOut />}
+        {showComponents.worckOutMain && (
+          <WorckOutMain 
+            workoutLevel={workoutLevel} 
+            setWorkoutLevel={setWorkoutLevel}
+            sportType={selectedSport}
+            colorType={selectedColor}
+            selectedTimeSeconds={selectedTimeSeconds}
+          />
+        )}
 
-      <SelectLevel level={workoutLevel} setLevel={setWorkoutLevel}/>
+        <SelectLevel level={workoutLevel} setLevel={setWorkoutLevel}/>
 
+        <SelectSportLevel onTimeChange={setSelectedTimeSeconds} />
+      </ScrollView>
+
+      {/* Кнопка остается за пределами ScrollView, чтобы всегда была видна */}
       <View style={styles.underSector}>   
         <View style={styles.sectors}>
           <View style={styles.buttomGOContainer}>
@@ -67,8 +72,6 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
-
-      <SelectSportLevel onTimeChange={setSelectedTimeSeconds} />
     </View>
   );
 }

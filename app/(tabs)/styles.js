@@ -403,7 +403,10 @@ export default styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-  }
+  },
+  scrollContainer: {
+  flex: 1, // Занимает все доступное пространство
+}
 
 
 });
