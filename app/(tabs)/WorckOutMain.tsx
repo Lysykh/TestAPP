@@ -5,13 +5,24 @@ import createTrainingArray from './runCalc';
 import { secondsToTimeString } from './SelectSportLevel';
 import styles from './styles';
 
+interface WorkoutItem {
+  id: number;
+  distance: number;
+  minTemp: number;
+  maxTemp: number;
+  relaxTemp: number;
+  reps: number;
+  sets: number;
+  totalDistance: number;
+  relaxDistance: number;
+}
+
 interface WorckOutMainProps {
   workoutLevel: number;
   setWorkoutLevel: React.Dispatch<React.SetStateAction<number>>;
   sportType: string | null;
   colorType: string | null;
   selectedTimeSeconds: number | null;
-  
 }
 
 const WorckOutMain = ({ 
@@ -36,8 +47,6 @@ const WorckOutMain = ({
     }
   };
 
-let green1 = createTrainingArray(selectedTimeSeconds);
-
   const getColorName = (color: string | null): string => {
     if (!color) return 'не выбран';
     switch (color) {
@@ -54,29 +63,19 @@ let green1 = createTrainingArray(selectedTimeSeconds);
     }
   };
 
+  let green1 = createTrainingArray(selectedTimeSeconds);
+
+  // Находим элемент тренировки по workoutLevel
+  const workoutData = green1.find(item => item.id === workoutLevel);
+
   // Расчет времени: выбранное время + 40 секунд + 70 секунд
-let RaschetBeg;
-if (selectedTimeSeconds !== null) {
+  let RaschetBeg;
+  if (selectedTimeSeconds !== null) {
     RaschetBeg = selectedTimeSeconds + 40 + 70;
-} else {
+  } else {
     RaschetBeg = null;
-}
+  }
 
-// worckoutTemp - это переменная которая забирает отфильтрованное значение из массива green. Нафильтровать и сохранить можно было много. Пример ниже но я остановился на этом
-
-//   {green1
-//     .filter(item => item.id === workoutLevel) // Фильтруем только элемент с id = 14
-//     .map(item => 
-//       `ID: ${item.id}, Дистанция: ${item.distance}m, Темп: ${item.minTemp}s, Темп: ${item.maxTemp}s, Повторы: ${item.reps}, Подходы: ${item.sets}`
-//     ).join('')}
-
-let worckoutTemp = green1
-    .filter(item => item.id === workoutLevel) // Фильтруем только элемент с id = как WorckOutLevel
-    .map(item => 
-      `${item.minTemp}`
-    ).join('')
-
-    
   return (
     <View style={styles.worckOutMainContainer}>
       <Text style={styles.workoutSectionTitle}>РАЗМИНКА</Text>
@@ -86,27 +85,29 @@ let worckoutTemp = green1
         <Text>Спорт: {getSportName(sportType)}</Text>
         <Text>Цвет: {getColorName(colorType)}</Text>
 
-<Text style={styles.valueText}>
-  {green1
-    .filter(item => item.id === workoutLevel) // Фильтруем только элемент с id = 14
-    .map(item => 
-      `ID: ${item.id}, Дистанция: ${item.distance}m, Темп: ${item.minTemp}s, Темп: ${item.maxTemp}s, Темп отдыха: ${item.relaxTemp}s, Повторы: ${item.reps}, Подходы: ${item.sets}, Всего дистанция: ${item.totalDistance}, Дистанция отдыха: ${item.relaxDistance}`
-    ).join('')}
-</Text>
-
+        {workoutData && (
+          <Text style={styles.valueText}>
+            ID: {workoutData.id}, Дистанция: {workoutData.distance}m, 
+            Темп: {workoutData.minTemp}s, Темп: {workoutData.maxTemp}s, 
+            Темп отдыха: {workoutData.relaxTemp}s, Повторы: {workoutData.reps}, 
+            Подходы: {workoutData.sets}, Всего дистанция: {workoutData.totalDistance}, 
+            Дистанция отдыха: {workoutData.relaxDistance}
+          </Text>
+        )}
 
         <Text>Время на 100м: {selectedTimeSeconds !== null 
           ? secondsToTimeString(selectedTimeSeconds) 
           : 'не выбрано'
         }</Text>
-        {RaschetBeg !== null && (
-          <Text>Расчет бега: {secondsToTimeString(worckoutTemp)} 
-            {"\n"}({secondsToTimeString(worckoutTemp!)} + 40с + 70с)
+        
+        {RaschetBeg !== null && workoutData && (
+          <Text>Расчет бега: {secondsToTimeString(workoutData.minTemp)} 
+            {"\n"}({secondsToTimeString(workoutData.minTemp)} + 40с + 70с)
           </Text>
         )}
+        
         {sportType && colorType && (
           <Text>Идентификатор: {sportType}_{colorType}</Text>
-
         )}
       </View> 
       
@@ -130,98 +131,103 @@ let worckoutTemp = green1
         
         <View style={styles.valuesColumn}>
           <Text style={styles.valueText}>8 : 15</Text>
-          <Text style={styles.valueText}>Расчет бега: {secondsToTimeString(worckoutTemp)} 
-          </Text>
+          {workoutData && (
+            <Text style={styles.valueText}>Расчет бега: {secondsToTimeString(workoutData.minTemp)}</Text>
+          )}
         </View>
       </View> 
 
       <Text style={styles.workoutSectionTitle}>ОСНОВНОЕ ЗАДАНИЕ</Text>
       
-      <View style={styles.tagRow}>
-        <View style={[styles.stick, styles.whiteStick]} />
-        
-        <View style={styles.singleIconContainer}>
-          <Image 
-            source={require('../../assets/images/approaches_b.png')} 
-            style={styles.mediumIcon}
-          />
-        </View>
-        
-        <View style={styles.singleValueContainer}>
-          <Text style={styles.valueText}>2 повторений</Text>
-        </View>
-      </View> 
+      {workoutData && (
+        <>
+          <View style={styles.tagRow}>
+            <View style={[styles.stick, styles.whiteStick]} />
+            
+            <View style={styles.singleIconContainer}>
+              <Image 
+                source={require('../../assets/images/approaches_b.png')} 
+                style={styles.mediumIcon}
+              />
+            </View>
+            
+            <View style={styles.singleValueContainer}>
+              <Text style={styles.valueText}>{workoutData.sets} подходов</Text>
+            </View>
+          </View> 
 
-      <View style={styles.tagRow}>
-        <View style={[styles.stick, styles.whiteStick]} />
-        
-        <View style={styles.singleIconContainer}>
-          <Image 
-            source={require('../../assets/images/repeats_b.png')} 
-            style={styles.mediumIcon}
-          />
-        </View>
-        
-        <View style={styles.singleValueContainer}>
-          <Text style={styles.valueText}>2 повторений</Text>
-        </View>
-      </View> 
+          <View style={styles.tagRow}>
+            <View style={[styles.stick, styles.whiteStick]} />
+            
+            <View style={styles.singleIconContainer}>
+              <Image 
+                source={require('../../assets/images/repeats_b.png')} 
+                style={styles.mediumIcon}
+              />
+            </View>
+            
+            <View style={styles.singleValueContainer}>
+              <Text style={styles.valueText}>{workoutData.reps} повторений</Text>
+            </View>
+          </View> 
 
-      <View style={styles.workoutRow}>
-        <View style={[styles.stick, styles.goldenStick]} />
-        
-        <View style={styles.iconsColumn}>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/time_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/tempo_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-        </View>
-        
-        <View style={styles.valuesColumn}>
-          <Text style={styles.valueText}>8 : 15</Text>
-          <Text style={styles.valueText}>60 : 15</Text>
-        </View>
-      </View> 
+          <View style={styles.workoutRow}>
+            <View style={[styles.stick, styles.goldenStick]} />
+            
+            <View style={styles.iconsColumn}>
+              <View style={styles.iconContainer}>
+                <Image 
+                  source={require('../../assets/images/time_b.png')} 
+                  style={styles.smallIcon}
+                />
+              </View>
+              <View style={styles.iconContainer}>
+                <Image 
+                  source={require('../../assets/images/tempo_b.png')} 
+                  style={styles.smallIcon}
+                />
+              </View>
+            </View>
+            
+            <View style={styles.valuesColumn}>
+              <Text style={styles.valueText}>{secondsToTimeString(workoutData.minTemp)}</Text>
+              <Text style={styles.valueText}>{secondsToTimeString(workoutData.maxTemp)}</Text>
+            </View>
+          </View> 
 
-      <View style={styles.workoutRow}>
-        <View style={[styles.stick, styles.beigeStick]} />
-        
-        <View style={styles.iconsColumn}>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/time_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/tempo_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-        </View>
-        
-        <View style={styles.valuesColumn}>
-          <Text style={styles.valueText}>8 : 15</Text>
-          <Text style={styles.valueText}>60 : 15</Text>
-        </View>
-      </View> 
+          <View style={styles.workoutRow}>
+            <View style={[styles.stick, styles.beigeStick]} />
+            
+            <View style={styles.iconsColumn}>
+              <View style={styles.iconContainer}>
+                <Image 
+                  source={require('../../assets/images/time_b.png')} 
+                  style={styles.smallIcon}
+                />
+              </View>
+              <View style={styles.iconContainer}>
+                <Image 
+                  source={require('../../assets/images/tempo_b.png')} 
+                  style={styles.smallIcon}
+                />
+              </View>
+            </View>
+            
+            <View style={styles.valuesColumn}>
+              <Text style={styles.valueText}>{secondsToTimeString(workoutData.relaxTemp)}</Text>
+              <Text style={styles.valueText}>{workoutData.relaxDistance}m</Text>
+            </View>
+          </View> 
 
-      <View style={styles.tagRow}>
-        <View style={[styles.stick, styles.lightGrayStick]} />
-        
-        <View style={styles.singleValueContainer}>
-          <Text style={styles.valueText}>Отдых между подходами 3 минуты</Text>
-        </View>
-      </View> 
+          <View style={styles.tagRow}>
+            <View style={[styles.stick, styles.lightGrayStick]} />
+            
+            <View style={styles.singleValueContainer}>
+              <Text style={styles.valueText}>Отдых между подходами 3 минуты</Text>
+            </View>
+          </View> 
+        </>
+      )}
 
       <Text style={styles.workoutSectionTitle}>ЗАМИНКА</Text>
       
