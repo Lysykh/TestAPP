@@ -49,7 +49,11 @@ export default function HomeScreen() {
 
         <SelectLevel level={workoutLevel} setLevel={setWorkoutLevel}/>
 
-        <SelectSportLevel onTimeChange={setSelectedTimeSeconds} />
+        {/* Передаем выбранный вид спорта в SelectSportLevel */}
+        <SelectSportLevel 
+          onTimeChange={setSelectedTimeSeconds} 
+          selectedSport={selectedSport} // Добавляем пропс selectedSport
+        />
       </ScrollView>
 
       {/* Кнопка остается за пределами ScrollView, чтобы всегда была видна */}

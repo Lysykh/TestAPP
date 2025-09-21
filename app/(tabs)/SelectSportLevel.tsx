@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 interface SelectSportLevelProps {
   onTimeChange: (timeInSeconds: number | null) => void;
+  selectedSport: string | null; // Изменяем тип на string | null
 }
 
 // Функция для преобразования времени в секунды
@@ -18,15 +19,51 @@ const secondsToTimeString = (totalSeconds: number): string => {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange }) => {
+const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selectedSport }) => {
   const [selectedTimeSeconds, setSelectedTimeSeconds] = useState<number | null>(null);
   const [selectedBox, setSelectedBox] = useState<number | null>(null);
+  const [timeOptionsInSeconds, setTimeOptionsInSeconds] = useState<number[]>([]);
+  const [buttonDistance, setButtonDistance] = useState<number>(100);
+  const [distanceText, setDistanceText] = useState<string>('100м');
 
-  // Массив времени в секундах для внутренних вычислений
-  const timeOptionsInSeconds = [120, 115, 110, 105, 100, 95, 90];
-  
-  // Массив для отображения пользователю
-  const timeOptionsForDisplay = ['02:00', '01:55', '01:50', '01:45', '01:40', '01:35', '01:30'];
+  // Обновляем параметры при изменении выбранного вида спорта
+  useEffect(() => {
+    let newTimeOptions: number[];
+    let newButtonDistance: number;
+    let newDistanceText: string;
+
+    switch (selectedSport) {
+      case 'swim':
+        newTimeOptions = [120, 115, 110, 105, 100, 95, 90];
+        newButtonDistance = 100;
+        newDistanceText = '100м';
+        break;
+      case 'run':
+        newTimeOptions = [1200, 1150, 1100, 1050, 1000, 950, 900];
+        newButtonDistance = 1000;
+        newDistanceText = '1км';
+        break;
+      case 'bike':
+        newTimeOptions = [12000, 11500, 11000, 10500, 10000, 9500, 9000];
+        newButtonDistance = 1000;
+        newDistanceText = '1км';
+        break;
+      default:
+        // Значения по умолчанию (до выбора спорта)
+        newTimeOptions = [120, 115, 110, 105, 100, 95, 90];
+        newButtonDistance = 100;
+        newDistanceText = '100м';
+    }
+
+    setTimeOptionsInSeconds(newTimeOptions);
+    setButtonDistance(newButtonDistance);
+    setDistanceText(newDistanceText);
+    
+    // Сбрасываем выбор при изменении вида спорта
+    setSelectedBox(null);
+    setSelectedTimeSeconds(null);
+    onTimeChange(null);
+  }, [selectedSport, onTimeChange]);
 
   const handleBoxPress = (index: number, timeInSeconds: number) => {
     setSelectedBox(index);
@@ -78,17 +115,20 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange }) => 
             ]}
             onPress={() => handleBoxPress(index, timeInSeconds)}
           >
-            <Text style={{ textAlign: 'center' }}>
-              100М{"\n"}
+            <Text style={{ textAlign: 'center', fontSize: 12 }}>
+              {distanceText}{"\n"}
               {secondsToTimeString(timeInSeconds)}
             </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
       
-      {/* Дополнительная информация для отладки (можно удалить) */}
+      {/* Дополнительная информация для отладки */}
       <Text style={{ padding: 10, fontSize: 12, color: '#666' }}>
-        Выбрано: {selectedTimeSeconds !== null 
+        Выбранный спорт: {selectedSport || 'не выбран'}
+      </Text>
+      <Text style={{ padding: 10, fontSize: 12, color: '#666' }}>
+        Выбрано время: {selectedTimeSeconds !== null 
           ? `${secondsToTimeString(selectedTimeSeconds)} (${selectedTimeSeconds} секунд)`
           : 'не выбрано'
         }

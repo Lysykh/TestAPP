@@ -98,6 +98,11 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
     setSelectedSport('swim'); // Английское название для финальной переменной
     setSelectedColor(nextType); // Английское название цвета
     resetOtherSports('swim'); // Сбрасываем другие виды спорта к серому
+    
+    // Уведомляем родительский компонент об изменении
+    onSportChange('swim');
+    onColorChange(nextType);
+    
     console.log('sport: swim, swimType: ' + nextType);
   };
 
@@ -108,6 +113,11 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
     setSelectedSport('run'); // Английское название для финальной переменной
     setSelectedColor(nextType); // Английское название цвета
     resetOtherSports('run'); // Сбрасываем другие виды спорта к серому
+    
+    // Уведомляем родительский компонент об изменении
+    onSportChange('run');
+    onColorChange(nextType);
+    
     console.log('sport: run, runType: ' + nextType);
   };
 
@@ -118,6 +128,11 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
     setSelectedSport('bike'); // Английское название для финальной переменной
     setSelectedColor(nextType); // Английское название цвета
     resetOtherSports('bike'); // Сбрасываем другие виды спорта к серому
+    
+    // Уведомляем родительский компонент об изменении
+    onSportChange('bike');
+    onColorChange(nextType);
+    
     console.log('sport: bike, bikeType: ' + nextType);
   };
 
@@ -181,9 +196,7 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
   return (
     <View style={styles.sportSelectContainer}>
       {/* Заголовок секции */}
-      <Text style={styles.sportSelectTitle}>ВИД СПОРТА v16 200925
-        
-      </Text>
+      <Text style={styles.sportSelectTitle}>ВИД СПОРТА v16 200925</Text>
       
       {/* Основной контейнер для видов спорта с горизонтальной прокруткой */}
       <ScrollView 
