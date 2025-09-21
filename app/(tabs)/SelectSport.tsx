@@ -181,7 +181,9 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
   return (
     <View style={styles.sportSelectContainer}>
       {/* Заголовок секции */}
-      <Text style={styles.sportSelectTitle}>ВИД СПОРТА v14 2009</Text>
+      <Text style={styles.sportSelectTitle}>ВИД СПОРТА v16 200925
+        
+      </Text>
       
       {/* Основной контейнер для видов спорта с горизонтальной прокруткой */}
       <ScrollView 
