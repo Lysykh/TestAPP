@@ -34,17 +34,17 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
 
     switch (selectedSport) {
       case 'swim':
-        newTimeOptions = [120, 115, 110, 105, 100, 95, 90];
+        newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
         newButtonDistance = 100;
         newDistanceText = '100м';
         break;
       case 'run':
-        newTimeOptions = [1200, 1150, 1100, 1050, 1000, 950, 900];
+        newTimeOptions = [480, 420, 390, 375, 360, 355, 350];
         newButtonDistance = 1000;
         newDistanceText = '1км';
         break;
       case 'bike':
-        newTimeOptions = [12000, 11500, 11000, 10500, 10000, 9500, 9000];
+        newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
         newButtonDistance = 1000;
         newDistanceText = '1км';
         break;
