@@ -406,8 +406,25 @@ export default styles = StyleSheet.create({
   },
   scrollContainer: {
   flex: 1, // Занимает все доступное пространство
-}
+},
 
+// Добавьте эти стили в ваш существующий StyleSheet
+workoutInfoContainer: {
+  padding: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: '#E7E7E7',
+},
+
+workoutInfoText: {
+  fontSize: 14,
+  marginBottom: 2,
+  color: '#666',
+},
+
+calcContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+}
 
 });
 
