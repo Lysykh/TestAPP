@@ -140,7 +140,7 @@ const WorckOutMain = ({
           </View>
           <View style={styles.iconContainer}>
             <Image 
-              source={require('../../assets/images/tempo_b.png')} 
+              source={require('../../assets/images/distance.png')} 
               style={styles.smallIcon}
             />
           </View>
@@ -196,7 +196,7 @@ const WorckOutMain = ({
           </View>
           <View style={styles.iconContainer}>
             <Image 
-              source={require('../../assets/images/tempo_b.png')} 
+              source={require('../../assets/images/distance.png')} 
               style={styles.smallIcon}
             />
           </View>
@@ -221,7 +221,7 @@ const WorckOutMain = ({
           </View>
           <View style={styles.iconContainer}>
             <Image 
-              source={require('../../assets/images/tempo_b.png')} 
+              source={require('../../assets/images/distance.png')} 
               style={styles.smallIcon}
             />
           </View>
@@ -254,7 +254,7 @@ const WorckOutMain = ({
           </View>
           <View style={styles.iconContainer}>
             <Image 
-              source={require('../../assets/images/tempo_b.png')} 
+              source={require('../../assets/images/distance.png')} 
               style={styles.smallIcon}
             />
           </View>

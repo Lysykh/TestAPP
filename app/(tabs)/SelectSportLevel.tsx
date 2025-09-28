@@ -123,16 +123,7 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
         ))}
       </ScrollView>
       
-      {/* Дополнительная информация для отладки */}
-      <Text style={{ padding: 10, fontSize: 12, color: '#666' }}>
-        Выбранный спорт: {selectedSport || 'не выбран'}
-      </Text>
-      <Text style={{ padding: 10, fontSize: 12, color: '#666' }}>
-        Выбрано время: {selectedTimeSeconds !== null 
-          ? `${secondsToTimeString(selectedTimeSeconds)} (${selectedTimeSeconds} секунд)`
-          : 'не выбрано'
-        }
-      </Text>
+    
     </View>
   );
 };

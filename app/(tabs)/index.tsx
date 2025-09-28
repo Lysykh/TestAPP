@@ -65,10 +65,10 @@ export default function HomeScreen() {
               <Text style={styles.buttomGOText}>
                 {showWorkoutMain ? 'НАЗАД К НАСТРОЙКАМ' : 'СОЗДАТЬ ТРЕНИРОВКУ'}
               </Text>
-              <Text>Уровень + 2: {workoutLevel + 2}</Text>
+              
             </TouchableOpacity>
 
-            <Text>Уровень + 2: {workoutLevel + 2}</Text>
+            
           </View>
         </View>
       </View>

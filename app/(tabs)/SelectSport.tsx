@@ -212,7 +212,7 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
             style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={styles.sportItemText}>Плавание</Text>
+            
           </ImageBackground>
         </TouchableOpacity>
         
@@ -223,7 +223,7 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
             style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={styles.sportItemText}>Бег</Text>
+            
           </ImageBackground>
         </TouchableOpacity>
         
@@ -234,7 +234,7 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
             style={styles.sportItemContainer}
             resizeMode="contain"
           >
-            <Text style={styles.sportItemText}>Велосипед</Text>
+           
           </ImageBackground>
         </TouchableOpacity>
 
@@ -248,15 +248,9 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
         </View>
       </ScrollView>
       
-      {/* Отображение выбранного вида спорта и цвета */}
-      <Text style={styles.sportSelectionInfo}>
-        Выбран: {selectedSport ? getSportName(selectedSport) : 'ничего'}{selectedColor ? `, цвет: ${getColorName(selectedColor)}` : ''}
-      </Text>
+   
       
-      {/* Отображение финальных значений на английском (для отладки) */}
-      <Text style={styles.sportFinalValues}>
-        Final values: Sport={SportTypeFinal || 'null'}, Color={ColorTypeFinal || 'null'}
-      </Text>
+
     </View>
   );
 }
