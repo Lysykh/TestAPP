@@ -12,10 +12,9 @@ const timeStringToSeconds = (timeString: string): number => {
   return minutes * 60 + seconds;
 };
 
-// Функция для преобразования секунд в строку мм:сс
 const secondsToTimeString = (totalSeconds: number): string => {
   const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
+  const seconds = Math.floor(totalSeconds % 60); // Добавляем Math.floor
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 

@@ -1,4 +1,4 @@
-// ОРАНЬЖЕВАЯ ЕЩЕ НЕ ИСПРАВЛЯЛ
+// КРАСНАЯ ЕЩЕ НЕ ИСПРАВЛЯЛ
 
 // описание калькулятора регулярный бег
 // 1. Ограничения дистанции от 800 до 2400 
@@ -36,7 +36,7 @@ export type RunLong = {
 };
 
 // Функция для создания массива тренировок с фиксированными значениями
-export default function createTrainingArray_orange(
+export default function createTrainingArray_red_bike(
   temp: number,
 ): RunLong[] {
   const trainingArray: RunLong[] = [];
@@ -47,10 +47,10 @@ export default function createTrainingArray_orange(
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
     for (let reps = 1; reps <= 10; reps++) {
-      let distance = 8000;
+      let distance = 777;
       
       for (let i = 0; i < count; i++) {
-        if (distance > 240000) {
+        if (distance > 240000000) {
           break;
         }
         
@@ -69,7 +69,7 @@ export default function createTrainingArray_orange(
            
         });
         
-        distance += 2000;
+        distance += 2000000;
       }
     }
   }

@@ -1,5 +1,3 @@
-// КРАСНАЯ ЕЩЕ НЕ ИСПРАВЛЯЛ
-
 // описание калькулятора регулярный бег
 // 1. Ограничения дистанции от 800 до 2400 
 // 2. минимальная дистанция 3000 метров
@@ -32,11 +30,11 @@ export type RunLong = {
   relaxTemp: number | null;
   relaxDistance: number | null;
   totalDistance: number;
-  totalTime:number;
+  totalTime: number;
 };
 
 // Функция для создания массива тренировок с фиксированными значениями
-export default function createTrainingArray_red(
+export default function createTrainingArray_bike(
   temp: number,
 ): RunLong[] {
   const trainingArray: RunLong[] = [];
@@ -47,12 +45,15 @@ export default function createTrainingArray_red(
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
     for (let reps = 1; reps <= 10; reps++) {
-      let distance = 8000000;
+      let distance = 888;
       
       for (let i = 0; i < count; i++) {
-        if (distance > 240000000) {
+        if (distance > 2400) {
           break;
         }
+        
+        // Округляем relaxDistance до ближайших 100
+        const relaxDistance = Math.ceil(distance * 0.2 / 100) * 100;
         
         trainingArray.push({
           id: idCounter++,
@@ -63,13 +64,12 @@ export default function createTrainingArray_red(
           minTemp: temp * 1.05,
           maxTemp: temp,
           relaxTemp: temp * 1.25,
-          relaxDistance: distance * 0.2,
-          totalDistance: (distance + (distance * 0.2)) * reps * sets,
-          totalTime: (distance + (distance * 0.2)) * reps * sets 
-           
+          relaxDistance: relaxDistance,
+          totalDistance: (distance + relaxDistance) * reps * sets,
+          totalTime: (distance + relaxDistance) * reps * sets 
         });
         
-        distance += 2000000;
+        distance += 200;
       }
     }
   }

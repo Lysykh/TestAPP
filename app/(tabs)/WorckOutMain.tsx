@@ -1,8 +1,18 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
-import createTrainingArray from './runCalc';
-import createTrainingArray_orange from './runCalcOrange';
-import createTrainingArray_red from './runCalcRed';
+
+import createTrainingArray_run from './calc/runCalc';
+import createTrainingArray_orange_run from './calc/runCalcOrange';
+import createTrainingArray_red_run from './calc/runCalcRed';
+
+import createTrainingArray_swim from './calc/swimCalc';
+import createTrainingArray_orange_swim from './calc/swimCalcOrange';
+import createTrainingArray_red_swim from './calc/swimCalcRed';
+
+import createTrainingArray_bike from './calc/bikeCalc';
+import createTrainingArray_orange_bike from './calc/bikeCalcOrange';
+import createTrainingArray_red_bike from './calc/bikeCalcRed';
+
 import { secondsToTimeString } from './SelectSportLevel';
 import styles from './styles';
 
@@ -64,27 +74,64 @@ const WorckOutMain = ({
     }
   };
 
-  // Обрабатываем все возможные варианты colorType
+  // Функция для выбора соответствующей функции расчета в зависимости от вида спорта и цвета
+  const getTrainingArrayFunction = () => {
+    if (!sportType || selectedTimeSeconds === null) {
+      return () => [];
+    }
+
+    switch (sportType) {
+      case 'run':
+        switch (colorType) {
+          case 'green':
+          case 'grey':
+            return createTrainingArray_run;
+          case 'orange':
+            return createTrainingArray_orange_run;
+          case 'red':
+            return createTrainingArray_red_run;
+          default:
+            return createTrainingArray_run;
+        }
+      
+      case 'swim':
+        switch (colorType) {
+          case 'green':
+          case 'grey':
+            return createTrainingArray_swim;
+          case 'orange':
+            return createTrainingArray_orange_swim;
+          case 'red':
+            return createTrainingArray_red_swim;
+          default:
+            return createTrainingArray_swim;
+        }
+      
+      case 'bike':
+        switch (colorType) {
+          case 'green':
+          case 'grey':
+            return createTrainingArray_bike;
+          case 'orange':
+            return createTrainingArray_orange_bike;
+          case 'red':
+            return createTrainingArray_red_bike;
+          default:
+            return createTrainingArray_bike;
+        }
+      
+      default:
+        // Для неизвестных видов спорта используем бег как fallback
+        return createTrainingArray_run;
+    }
+  };
+
+  // Получаем соответствующую функцию и создаем массив тренировок
   let trainingArray: WorkoutItem[] = [];
   
-  if (selectedTimeSeconds !== null) {
-    switch (colorType) {
-      case 'green':
-        trainingArray = createTrainingArray(selectedTimeSeconds);
-        break;
-      case 'orange':
-        trainingArray = createTrainingArray_orange(selectedTimeSeconds);
-        break;
-      case 'red':
-        trainingArray = createTrainingArray_red(selectedTimeSeconds);
-        break;
-      case 'grey':
-        trainingArray = createTrainingArray(selectedTimeSeconds);
-        break;
-      default:
-        trainingArray = createTrainingArray(selectedTimeSeconds);
-        break;
-    }
+  if (selectedTimeSeconds !== null && sportType) {
+    const createTrainingArrayFunction = getTrainingArrayFunction();
+    trainingArray = createTrainingArrayFunction(selectedTimeSeconds);
   }
 
   // Находим элемент тренировки по workoutLevel
@@ -106,6 +153,20 @@ const WorckOutMain = ({
       </View>
     );
   }
+
+  // Функция для получения текста в зависимости от вида спорта
+  const getSportSpecificText = (baseText: string) => {
+    if (!sportType) return baseText;
+    
+    switch (sportType) {
+      case 'swim':
+        return baseText.replace('бег', 'разминочное плавание');
+      case 'bike':
+        return baseText.replace('бег', 'разминочная езда');
+      default:
+        return baseText;
+    }
+  };
 
   return (
     <View style={styles.worckOutMainContainer}>
@@ -140,15 +201,15 @@ const WorckOutMain = ({
           </View>
           <View style={styles.iconContainer}>
             <Image 
-              source={require('../../assets/images/distance.png')} 
+              source={require('../../assets/images/tempo_b.png')} 
               style={styles.smallIcon}
             />
           </View>
         </View>
         <View style={styles.valuesColumn}>
-          <Text style={styles.valueText}>8 : 15</Text>
+          <Text style={styles.valueText}>10:00</Text>
           <Text style={styles.valueText}>
-            Расчет бега: {secondsToTimeString(workoutData.minTemp)}
+            {getSportSpecificText(`Разминочный бег: ${secondsToTimeString(workoutData.minTemp)}`)}
           </Text>
         </View>
       </View>
@@ -190,7 +251,7 @@ const WorckOutMain = ({
         <View style={styles.iconsColumn}>
           <View style={styles.iconContainer}>
             <Image 
-              source={require('../../assets/images/time_b.png')} 
+              source={require('../../assets/images/tempo_b.png')} 
               style={styles.smallIcon}
             />
           </View>
@@ -215,7 +276,7 @@ const WorckOutMain = ({
         <View style={styles.iconsColumn}>
           <View style={styles.iconContainer}>
             <Image 
-              source={require('../../assets/images/time_b.png')} 
+              source={require('../../assets/images/tempo_b.png')} 
               style={styles.smallIcon}
             />
           </View>
@@ -254,16 +315,17 @@ const WorckOutMain = ({
           </View>
           <View style={styles.iconContainer}>
             <Image 
-              source={require('../../assets/images/distance.png')} 
+              source={require('../../assets/images/tempo_b.png')} 
               style={styles.smallIcon}
             />
           </View>
         </View>
         <View style={styles.valuesColumn}>
-          <Text style={styles.valueText}>8 : 15</Text>
+          <Text style={styles.valueText}>10:00</Text>
           <View style={styles.calcContainer}>
-            <Text style={styles.valueText}>60 : 15 </Text>
-            
+            <Text style={styles.valueText}>
+              {getSportSpecificText(`Расчет бега: ${secondsToTimeString(workoutData.minTemp)}`)}
+            </Text>
           </View>
         </View>
       </View>
