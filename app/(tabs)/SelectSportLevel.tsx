@@ -38,7 +38,7 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
         newDistanceText = '100м';
         break;
       case 'run':
-        newTimeOptions = [480, 420, 390, 375, 360, 355, 350];
+        newTimeOptions = [480, 420, 390, 375, 360, 350, 345, 340, 335, 330, 325, 320, 315, 310,];
         newButtonDistance = 1000;
         newDistanceText = '1км';
         break;

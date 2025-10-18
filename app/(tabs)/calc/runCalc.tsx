@@ -1,4 +1,4 @@
-// описание калькулятора регулярный бег
+// описание калькулятора зеленый велосипед
 // 1. Ограничения дистанции от 800 до 2400 
 // 2. минимальная дистанция 3000 метров
 // 3. масимальная дистанция 10000 метров 
@@ -34,7 +34,7 @@ export type RunLong = {
 };
 
 // Функция для создания массива тренировок с фиксированными значениями
-export default function createTrainingArray_run(
+export default function createTrainingArray_bike(
   temp: number,
 ): RunLong[] {
   const trainingArray: RunLong[] = [];
@@ -45,15 +45,27 @@ export default function createTrainingArray_run(
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
     for (let reps = 1; reps <= 10; reps++) {
-      let distance = 666;
       
+// [480, 420, 390, 375, 360, 350, 345, 340, 335, 330, 325, 320, 315, 310,];
+       
+  
+      let distance: number;
+  if (temp === 480) {
+    distance = 2000;
+  } else if (temp === 360) {
+    distance = 4000;
+  } else {
+    // Значение по умолчанию или для других случаев
+    distance = 5000;
+  }
+
       for (let i = 0; i < count; i++) {
-        if (distance > 2400) {
+        if (distance > (distance * 2)) {
           break;
         }
         
         // Округляем relaxDistance до ближайших 100
-        const relaxDistance = Math.ceil(distance * 0.2 / 100) * 100;
+        const relaxDistance = Math.ceil(distance * 0.2 / 1000) * 1000;
         
         trainingArray.push({
           id: idCounter++,
@@ -62,14 +74,14 @@ export default function createTrainingArray_run(
           reps: reps,
           sets: sets,
           minTemp: temp * 1.05,
-          maxTemp: temp,
+          maxTemp: temp * 1.13,
           relaxTemp: temp * 1.25,
           relaxDistance: relaxDistance,
           totalDistance: (distance + relaxDistance) * reps * sets,
           totalTime: (distance + relaxDistance) * reps * sets 
         });
         
-        distance += 200;
+        distance += 500;
       }
     }
   }

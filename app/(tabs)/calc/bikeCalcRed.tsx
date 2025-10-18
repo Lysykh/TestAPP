@@ -1,4 +1,4 @@
-// КРАСНАЯ ЕЩЕ НЕ ИСПРАВЛЯЛ
+// ОРАНЬЖЕВАЯ ЕЩЕ НЕ ИСПРАВЛЯЛ
 
 // описание калькулятора регулярный бег
 // 1. Ограничения дистанции от 800 до 2400 
@@ -11,7 +11,6 @@
 // 8. количество повторений не больше 10
 // 9. количество подходов не более 5
 
-		
 // ТЕМПОВЫЕ ЗОНЫ	НОРМА	минимум	максимум
 // 1	135%	трусца	08:16
 // ОТДЫХ 2	129%	08:16	07:54
@@ -36,7 +35,7 @@ export type RunLong = {
 };
 
 // Функция для создания массива тренировок с фиксированными значениями
-export default function createTrainingArray_red_bike(
+export default function createTrainingArray_orange_bike(
   temp: number,
 ): RunLong[] {
   const trainingArray: RunLong[] = [];
@@ -46,11 +45,22 @@ export default function createTrainingArray_red_bike(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 1; reps <= 10; reps++) {
-      let distance = 777;
-      
+    for (let reps = 10; reps <= 20; reps++) {
+  
+  //  [160, 150, 140, 130, 120, 110, 105]
+  
+      let distance: number;
+  if (temp === 160) {
+    distance = 500;
+  } else if (temp === 130) {
+    distance = 1000;
+  } else {
+    // Значение по умолчанию или для других случаев
+    distance = 1500;
+  }
+
       for (let i = 0; i < count; i++) {
-        if (distance > 240000000) {
+        if (distance > 240000) {
           break;
         }
         
@@ -60,16 +70,16 @@ export default function createTrainingArray_red_bike(
           temp: temp,
           reps: reps,
           sets: sets,
-          minTemp: temp * 1.05,
-          maxTemp: temp,
+          minTemp: temp,
+          maxTemp: temp * 0.96,
           relaxTemp: temp * 1.25,
-          relaxDistance: distance * 0.2,
-          totalDistance: (distance + (distance * 0.2)) * reps * sets,
-          totalTime: (distance + (distance * 0.2)) * reps * sets 
+          relaxDistance: distance * 1,
+          totalDistance: (distance + (distance * 1)) * reps * sets,
+          totalTime: (distance + (distance * 1)) * reps * sets 
            
         });
         
-        distance += 2000000;
+        distance += 200;
       }
     }
   }

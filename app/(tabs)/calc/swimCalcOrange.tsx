@@ -46,8 +46,23 @@ export default function createTrainingArray_orange_swim(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 1; reps <= 10; reps++) {
-      let distance = 333;
+    for (let reps = 5; reps <= 15; reps++) {
+      
+      
+          //  newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
+
+  
+      let distance: number;
+  if (temp === 480) {
+    distance = 400;
+  } else if (temp === 420) {
+    distance = 800;
+  } else {
+    // Значение по умолчанию или для других случаев
+    distance = 1200;
+  }  
+
+      
       
       for (let i = 0; i < count; i++) {
         if (distance > 2400) {
@@ -60,16 +75,16 @@ export default function createTrainingArray_orange_swim(
           temp: temp,
           reps: reps,
           sets: sets,
-          minTemp: temp * 1.05,
-          maxTemp: temp,
+          minTemp: temp,
+          maxTemp: temp * 1.05,
           relaxTemp: temp * 1.25,
-          relaxDistance: distance * 0.2,
-          totalDistance: (distance + (distance * 0.2)) * reps * sets,
-          totalTime: (distance + (distance * 0.2)) * reps * sets 
+          relaxDistance: distance * 0.5,
+          totalDistance: (distance + (distance * 0.5)) * reps * sets,
+          totalTime: (distance + (distance * 0.5)) * reps * sets 
            
         });
         
-        distance += 2000;
+        distance += 100;
       }
     }
   }

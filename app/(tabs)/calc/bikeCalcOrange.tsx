@@ -11,7 +11,6 @@
 // 8. количество повторений не больше 10
 // 9. количество подходов не более 5
 
-		
 // ТЕМПОВЫЕ ЗОНЫ	НОРМА	минимум	максимум
 // 1	135%	трусца	08:16
 // ОТДЫХ 2	129%	08:16	07:54
@@ -46,9 +45,20 @@ export default function createTrainingArray_orange_bike(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 1; reps <= 10; reps++) {
-      let distance = 999;
-      
+    for (let reps = 8; reps <= 17; reps++) {
+  
+  //  [160, 150, 140, 130, 120, 110, 105]
+  
+      let distance: number;
+  if (temp === 160) {
+    distance = 1000;
+  } else if (temp === 130) {
+    distance = 2000;
+  } else {
+    // Значение по умолчанию или для других случаев
+    distance = 3000;
+  }
+
       for (let i = 0; i < count; i++) {
         if (distance > 240000) {
           break;
@@ -60,16 +70,16 @@ export default function createTrainingArray_orange_bike(
           temp: temp,
           reps: reps,
           sets: sets,
-          minTemp: temp * 1.05,
-          maxTemp: temp,
+          minTemp: temp,
+          maxTemp: temp * 1.05,
           relaxTemp: temp * 1.25,
-          relaxDistance: distance * 0.2,
-          totalDistance: (distance + (distance * 0.2)) * reps * sets,
-          totalTime: (distance + (distance * 0.2)) * reps * sets 
+          relaxDistance: distance * 0.5,
+          totalDistance: (distance + (distance * 0.5)) * reps * sets,
+          totalTime: (distance + (distance * 0.5)) * reps * sets 
            
         });
         
-        distance += 2000;
+        distance += 500;
       }
     }
   }

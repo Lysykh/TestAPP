@@ -44,6 +44,7 @@ const WorckOutMain = ({
   selectedTimeSeconds 
 }: WorckOutMainProps) => {
   
+
   const getSportName = (sport: string | null): string => {
     if (!sport) return 'не выбран';
     switch (sport) {
@@ -58,6 +59,10 @@ const WorckOutMain = ({
     }
   };
 
+let razryad = 1000;
+if (getSportName(sportType) === 'плавание') {
+    razryad = 100;
+}
   const getColorName = (color: string | null): string => {
     if (!color) return 'не выбран';
     switch (color) {
@@ -160,9 +165,9 @@ const WorckOutMain = ({
     
     switch (sportType) {
       case 'swim':
-        return baseText.replace('бег', 'разминочное плавание');
+        return baseText.replace('бег', 'плавание');
       case 'bike':
-        return baseText.replace('бег', 'разминочная езда');
+        return baseText.replace('бег', 'езда');
       default:
         return baseText;
     }
@@ -177,7 +182,7 @@ const WorckOutMain = ({
         <Text style={styles.workoutInfoText}>Спорт: {getSportName(sportType)}</Text>
         <Text style={styles.workoutInfoText}>Цвет: {getColorName(colorType)}</Text>
         <Text style={styles.workoutInfoText}>Общая дистанция: {workoutData.totalDistance}</Text>
-        <Text style={styles.workoutInfoText}>Общая продолжительность: {secondsToTimeString(workoutData.totalDistance / 1000 * selectedTimeSeconds)} </Text>
+        <Text style={styles.workoutInfoText}>Общая продолжительность: {secondsToTimeString(workoutData.totalDistance / razryad * selectedTimeSeconds)} </Text>
         <Text style={styles.workoutInfoText}>
           Темп ПАНО: {selectedTimeSeconds !== null 
             ? secondsToTimeString(selectedTimeSeconds) 
@@ -209,7 +214,7 @@ const WorckOutMain = ({
         <View style={styles.valuesColumn}>
           <Text style={styles.valueText}>10:00</Text>
           <Text style={styles.valueText}>
-            {getSportSpecificText(`Разминочный бег: ${secondsToTimeString(workoutData.minTemp)}`)}
+            {getSportSpecificText(`Разминочный бег: ${secondsToTimeString(workoutData.relaxTemp)}`)}
           </Text>
         </View>
       </View>
@@ -324,7 +329,7 @@ const WorckOutMain = ({
           <Text style={styles.valueText}>10:00</Text>
           <View style={styles.calcContainer}>
             <Text style={styles.valueText}>
-              {getSportSpecificText(`Расчет бега: ${secondsToTimeString(workoutData.minTemp)}`)}
+              {getSportSpecificText(`Расчет бега: ${secondsToTimeString(workoutData.relaxTemp)}`)}
             </Text>
           </View>
         </View>

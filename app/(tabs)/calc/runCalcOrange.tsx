@@ -46,11 +46,22 @@ export default function createTrainingArray_orange_run(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 1; reps <= 10; reps++) {
-      let distance = 777;
-      
+    for (let reps = 5; reps <= 5; reps++) {
+          
+      // newTimeOptions = [480, 420, 390, 375, 360, 355, 350];
+  
+      let distance: number;
+  if (temp === 480) {
+    distance = 500;
+  } else if (temp === 360) {
+    distance = 1000;
+  } else {
+    // Значение по умолчанию или для других случаев
+    distance = 1500;
+  }
+
       for (let i = 0; i < count; i++) {
-        if (distance > 2400) {
+        if (distance > 240000) {
           break;
         }
         
@@ -60,16 +71,16 @@ export default function createTrainingArray_orange_run(
           temp: temp,
           reps: reps,
           sets: sets,
-          minTemp: temp * 1.05,
-          maxTemp: temp,
+          minTemp: temp,
+          maxTemp: temp * 1.05,
           relaxTemp: temp * 1.25,
-          relaxDistance: distance * 0.2,
-          totalDistance: (distance + (distance * 0.2)) * reps * sets,
-          totalTime: (distance + (distance * 0.2)) * reps * sets 
+          relaxDistance: distance * 0.5,
+          totalDistance: (distance + (distance * 0.5)) * reps * sets,
+          totalTime: (distance + (distance * 0.5)) * reps * sets 
            
         });
         
-        distance += 2000;
+        distance += 100;
       }
     }
   }

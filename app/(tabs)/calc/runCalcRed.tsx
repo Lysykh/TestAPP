@@ -46,11 +46,23 @@ export default function createTrainingArray_red_run(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 1; reps <= 10; reps++) {
-      let distance = 555;
+    for (let reps = 10; reps <= 20; reps++) {
       
+            // newTimeOptions = [480, 420, 390, 375, 360, 355, 350];
+  
+      let distance: number;
+  if (temp === 480) {
+    distance = 200;
+  } else if (temp === 360) {
+    distance = 400;
+  } else {
+    // Значение по умолчанию или для других случаев
+    distance = 600;
+  }
+
+
       for (let i = 0; i < count; i++) {
-        if (distance > 2400) {
+        if (distance > 24000) {
           break;
         }
         
@@ -60,16 +72,16 @@ export default function createTrainingArray_red_run(
           temp: temp,
           reps: reps,
           sets: sets,
-          minTemp: temp * 1.05,
-          maxTemp: temp,
+          minTemp: temp,
+          maxTemp: temp * 0.96,
           relaxTemp: temp * 1.25,
-          relaxDistance: distance * 0.2,
-          totalDistance: (distance + (distance * 0.2)) * reps * sets,
-          totalTime: (distance + (distance * 0.2)) * reps * sets 
-           
+          relaxDistance: distance * 1,
+          totalDistance: (distance + (distance * 1)) * reps * sets,
+          totalTime: (distance + (distance * 1)) * reps * sets 
+          
         });
         
-        distance += 2000000;
+        distance += 50;
       }
     }
   }

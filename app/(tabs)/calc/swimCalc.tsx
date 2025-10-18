@@ -45,8 +45,22 @@ export default function createTrainingArray_swim(
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
     for (let reps = 1; reps <= 10; reps++) {
-      let distance = 444;
       
+      
+    //  newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
+
+  
+      let distance: number;
+  if (temp === 160) {
+    distance = 400;
+  } else if (temp === 140) {
+    distance = 800;
+  } else {
+    // Значение по умолчанию или для других случаев
+    distance = 1200;
+  }  
+
+
       for (let i = 0; i < count; i++) {
         if (distance > 2400) {
           break;
@@ -66,7 +80,7 @@ export default function createTrainingArray_swim(
           relaxTemp: temp * 1.25,
           relaxDistance: relaxDistance,
           totalDistance: (distance + relaxDistance) * reps * sets,
-          totalTime: (distance + relaxDistance) * reps * sets 
+          totalTime: (distance + relaxDistance) * reps * sets
         });
         
         distance += 200;
