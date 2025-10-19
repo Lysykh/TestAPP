@@ -44,7 +44,7 @@ export default function createTrainingArray_swim(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 2; reps <= 12; reps++) {
+    for (let reps = 1; reps <= 12; reps++) {
       
       
     //  newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
@@ -90,6 +90,21 @@ export default function createTrainingArray_swim(
 
   // Сортируем массив по totalDistance в порядке возрастания
   trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
+
+// Дополнительная сортировка для одинаковой дистанции
+  trainingArray.sort((a, b) => {
+    if (a.totalDistance === b.totalDistance) {
+      // Сначала сравниваем по sets (большие значения вперед)
+      if (b.sets !== a.sets) {
+        return b.sets - a.sets;
+      }
+      // Затем сравниваем по reps (большие значения вперед)
+      if (b.reps !== a.reps) {
+        return b.reps - a.reps;
+      }
+    }
+    return a.totalDistance - b.totalDistance;
+  });
 
   // Перезаписываем id в соответствии с новой сортировкой
   trainingArray.forEach((training, index) => {

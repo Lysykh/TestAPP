@@ -65,7 +65,7 @@ export default function createTrainingArray_orange_swim(
       
       
       for (let i = 0; i < count; i++) {
-        if (distance > 2400) {
+        if (distance > 400) {
           break;
         }
         
@@ -91,6 +91,21 @@ export default function createTrainingArray_orange_swim(
 
   // Сортируем массив по totalDistance в порядке возрастания
   trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
+
+// Дополнительная сортировка для одинаковой дистанции
+  trainingArray.sort((a, b) => {
+    if (a.totalDistance === b.totalDistance) {
+      // Сначала сравниваем по sets (большие значения вперед)
+      if (b.sets !== a.sets) {
+        return b.sets - a.sets;
+      }
+      // Затем сравниваем по reps (большие значения вперед)
+      if (b.reps !== a.reps) {
+        return b.reps - a.reps;
+      }
+    }
+    return a.totalDistance - b.totalDistance;
+  });
 
   // Перезаписываем id в соответствии с новой сортировкой
   trainingArray.forEach((training, index) => {
