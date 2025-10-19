@@ -53,13 +53,13 @@ export default function createTrainingArray_red_swim(
 
   
       let distance: number;
-  if (temp === 480) {
-    distance = 400;
-  } else if (temp === 420) {
-    distance = 800;
+  if (temp === 160) {
+    distance = 25;
+  } else if (temp === 140) {
+    distance = 50;
   } else {
     // Значение по умолчанию или для других случаев
-    distance = 1200;
+    distance = 50;
   }  
 
       for (let i = 0; i < count; i++) {
@@ -82,7 +82,7 @@ export default function createTrainingArray_red_swim(
           
         });
         
-        distance += 50;
+        distance += 25;
       }
     }
   }

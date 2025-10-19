@@ -63,6 +63,8 @@ let razryad = 1000;
 if (getSportName(sportType) === 'плавание') {
     razryad = 100;
 }
+
+
   const getColorName = (color: string | null): string => {
     if (!color) return 'не выбран';
     switch (color) {
@@ -214,7 +216,7 @@ if (getSportName(sportType) === 'плавание') {
         <View style={styles.valuesColumn}>
           <Text style={styles.valueText}>10:00</Text>
           <Text style={styles.valueText}>
-            {getSportSpecificText(`Разминочный бег: ${secondsToTimeString(workoutData.relaxTemp)}`)}
+            {secondsToTimeString(workoutData.relaxTemp)}
           </Text>
         </View>
       </View>
@@ -329,7 +331,7 @@ if (getSportName(sportType) === 'плавание') {
           <Text style={styles.valueText}>10:00</Text>
           <View style={styles.calcContainer}>
             <Text style={styles.valueText}>
-              {getSportSpecificText(`Расчет бега: ${secondsToTimeString(workoutData.relaxTemp)}`)}
+              {secondsToTimeString(workoutData.relaxTemp)}
             </Text>
           </View>
         </View>
