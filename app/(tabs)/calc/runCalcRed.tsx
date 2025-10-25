@@ -46,23 +46,22 @@ export default function createTrainingArray_red_run(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 10; reps <= 20; reps++) {
+    for (let reps = 5; reps <= 15; reps++) {
       
-            // newTimeOptions = [480, 420, 390, 375, 360, 355, 350];
+            // newTimeOptions = [480, 420, 390, 375, 360, 350, 345, 340, 335, 330, 325, 320, 315, 310,];
   
       let distance: number;
-  if (temp === 480) {
-    distance = 200;
-  } else if (temp === 360) {
-    distance = 400;
-  } else {
-    // Значение по умолчанию или для других случаев
-    distance = 600;
-  }
-
+      if (temp === 480) {
+        distance = 100;
+      } else if (temp === 360) {
+        distance = 200;
+      } else {
+        // Значение по умолчанию или для других случаев
+        distance = 400;
+      }
 
       for (let i = 0; i < count; i++) {
-        if (distance > 24000) {
+        if (distance < 100 || distance > 800) {
           break;
         }
         
@@ -72,13 +71,12 @@ export default function createTrainingArray_red_run(
           temp: temp,
           reps: reps,
           sets: sets,
-          minTemp: temp,
-          maxTemp: temp * 0.96,
+          minTemp: temp * 0.96,
+          maxTemp: temp,
           relaxTemp: temp * 1.25,
           relaxDistance: distance * 1,
           totalDistance: (distance + (distance * 1)) * reps * sets,
           totalTime: (distance + (distance * 1)) * reps * sets 
-          
         });
         
         distance += 50;
@@ -89,7 +87,7 @@ export default function createTrainingArray_red_run(
   // Сортируем массив по totalDistance в порядке возрастания
   trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
 
-// Дополнительная сортировка для одинаковой дистанции
+  // Дополнительная сортировка для одинаковой дистанции
   trainingArray.sort((a, b) => {
     if (a.totalDistance === b.totalDistance) {
       // Сначала сравниваем по sets (большие значения вперед)
@@ -108,6 +106,28 @@ export default function createTrainingArray_red_run(
   trainingArray.forEach((training, index) => {
     training.id = index + 1;
   });
+
+  // Выводим все сгенерированные тренировки на консоль
+  console.log("=== ВСЕ СГЕНЕРИРОВАННЫЕ ТРЕНИРОВКИ ===");
+  console.log(`Всего тренировок: ${trainingArray.length}`);
+  console.log("======================================");
+  
+  trainingArray.forEach(training => {
+    console.log(`ID: ${training.id}`);
+    console.log(`  Дистанция: ${training.distance}м`);
+    console.log(`  Темп: ${training.temp} сек/км`);
+    console.log(`  Повторения: ${training.reps}`);
+    console.log(`  Подходы: ${training.sets}`);
+    console.log(`  Мин. темп: ${training.minTemp?.toFixed(2)} сек/км`);
+    console.log(`  Макс. темп: ${training.maxTemp} сек/км`);
+    console.log(`  Темп отдыха: ${training.relaxTemp?.toFixed(2)} сек/км`);
+    console.log(`  Дистанция отдыха: ${training.relaxDistance}м`);
+    console.log(`  Общая дистанция: ${training.totalDistance}м`);
+    console.log(`  Общее время: ${training.totalTime} сек`);
+    console.log("--------------------------------------");
+  });
+
+  console.log(`=== ВСЕГО ТРЕНИРОВОК: ${trainingArray.length} ===`);
 
   return trainingArray;
 }

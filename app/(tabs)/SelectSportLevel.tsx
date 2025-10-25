@@ -3,7 +3,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 interface SelectSportLevelProps {
   onTimeChange: (timeInSeconds: number | null) => void;
-  selectedSport: string | null; // Изменяем тип на string | null
+  selectedSport: string | null;
 }
 
 // Функция для преобразования времени в секунды
@@ -14,8 +14,23 @@ const timeStringToSeconds = (timeString: string): number => {
 
 const secondsToTimeString = (totalSeconds: number): string => {
   const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.floor(totalSeconds % 60); // Добавляем Math.floor
+  const seconds = Math.floor(totalSeconds % 60);
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+// Альтернативный вариант с фиксированными значениями ватт
+const getWattsForTime = (timeInSeconds: number): number => {
+  const wattsMap: { [key: number]: number } = {
+    160: 180,
+    150: 200,
+    140: 220,
+    130: 240,
+    120: 260,
+    110: 280,
+    105: 300
+  };
+  
+  return wattsMap[timeInSeconds] || 0;
 };
 
 const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selectedSport }) => {
@@ -24,39 +39,46 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
   const [timeOptionsInSeconds, setTimeOptionsInSeconds] = useState<number[]>([]);
   const [buttonDistance, setButtonDistance] = useState<number>(100);
   const [distanceText, setDistanceText] = useState<string>('100м');
+  const [showWatts, setShowWatts] = useState<boolean>(false);
 
   // Обновляем параметры при изменении выбранного вида спорта
   useEffect(() => {
     let newTimeOptions: number[];
     let newButtonDistance: number;
     let newDistanceText: string;
+    let newShowWatts: boolean;
 
     switch (selectedSport) {
       case 'swim':
         newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
         newButtonDistance = 100;
         newDistanceText = '100м';
+        newShowWatts = false;
         break;
       case 'run':
-        newTimeOptions = [480, 420, 390, 375, 360, 350, 345, 340, 335, 330, 325, 320, 315, 310,];
+        newTimeOptions = [480, 420, 390, 375, 360, 350, 345, 340, 335, 330, 325, 320, 315, 310];
         newButtonDistance = 1000;
         newDistanceText = '1км';
+        newShowWatts = false;
         break;
       case 'bike':
         newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
         newButtonDistance = 1000;
         newDistanceText = '1км';
+        newShowWatts = true;
         break;
       default:
         // Значения по умолчанию (до выбора спорта)
         newTimeOptions = [120, 115, 110, 105, 100, 95, 90];
         newButtonDistance = 100;
         newDistanceText = '100м';
+        newShowWatts = false;
     }
 
     setTimeOptionsInSeconds(newTimeOptions);
     setButtonDistance(newButtonDistance);
     setDistanceText(newDistanceText);
+    setShowWatts(newShowWatts);
     
     // Сбрасываем выбор при изменении вида спорта
     setSelectedBox(null);
@@ -117,16 +139,20 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
             <Text style={{ textAlign: 'center', fontSize: 12 }}>
               {distanceText}{"\n"}
               {secondsToTimeString(timeInSeconds)}
+              {showWatts && (
+                <>
+                  {"\n"}
+                  {getWattsForTime(timeInSeconds)}W
+                </>
+              )}
             </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
-      
-    
     </View>
   );
 };
 
 // Экспортируем вспомогательные функции для использования в других компонентах
-export { secondsToTimeString, timeStringToSeconds };
+export { getWattsForTime, secondsToTimeString, timeStringToSeconds };
 export default SelectSportLevel;

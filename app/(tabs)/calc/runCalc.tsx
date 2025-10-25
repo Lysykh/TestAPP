@@ -50,17 +50,22 @@ export default function createTrainingArray_bike(
        
   
       let distance: number;
-  if (temp === 480) {
-    distance = 2000;
-  } else if (temp === 360) {
-    distance = 4000;
-  } else {
-    // Значение по умолчанию или для других случаев
-    distance = 5000;
-  }
+      if (temp === 480) {
+        distance = 2000;
+      } else if (temp === 360) {
+        distance = 4000;
+      } else {
+        // Значение по умолчанию или для других случаев
+        distance = 5000;
+      }
+
+      // Инициализируем переменные для чередования
+      let currentMaxTemp = temp * 1.13; // начальное значение maxTemp
+      const minTempLimit = temp * 1.05 + 1.02; // minTemp + 0.02
+      let alternateFlag = false; // флаг для чередования
 
       for (let i = 0; i < count; i++) {
-        if (distance > (distance * 2)) {
+        if (distance < 800 || distance > 10000) {
           break;
         }
         
@@ -74,14 +79,24 @@ export default function createTrainingArray_bike(
           reps: reps,
           sets: sets,
           minTemp: temp * 1.05,
-          maxTemp: temp * 1.13,
+          maxTemp: currentMaxTemp,
           relaxTemp: temp * 1.25,
           relaxDistance: relaxDistance,
           totalDistance: (distance + relaxDistance) * reps * sets,
           totalTime: (distance + relaxDistance) * reps * sets 
         });
         
-        distance += 500;
+        // Чередование изменений
+        if (alternateFlag) {
+          // Уменьшаем maxTemp на 0.01, но не ниже minTemp + 0.02
+          currentMaxTemp = Math.max(currentMaxTemp - 2, minTempLimit);
+        } else {
+          // Увеличиваем дистанцию на 500
+          distance += 500;
+        }
+        
+        // Переключаем флаг для следующей итерации
+        alternateFlag = !alternateFlag;
       }
     }
   }
@@ -89,7 +104,7 @@ export default function createTrainingArray_bike(
   // Сортируем массив по totalDistance в порядке возрастания
   trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
 
-// Дополнительная сортировка для одинаковой дистанции
+  // Дополнительная сортировка для одинаковой дистанции
   trainingArray.sort((a, b) => {
     if (a.totalDistance === b.totalDistance) {
       // Сначала сравниваем по sets (большие значения вперед)
@@ -108,6 +123,37 @@ export default function createTrainingArray_bike(
   trainingArray.forEach((training, index) => {
     training.id = index + 1;
   });
+
+  // Выводим все тренировки в консоль
+  console.log("Все собранные тренировки:");
+  console.log("======================================");
+  
+  trainingArray.forEach(training => {
+    console.log(`ID: ${training.id}`);
+    console.log(`  Дистанция: ${training.distance} м`);
+    console.log(`  Темп: ${training.temp}`);
+    console.log(`  Повторения: ${training.reps}`);
+    console.log(`  Подходы: ${training.sets}`);
+    console.log(`  Мин. темп: ${training.minTemp}`);
+    console.log(`  Макс. темп: ${training.maxTemp}`);
+    console.log(`  Темп отдыха: ${training.relaxTemp}`);
+    console.log(`  Дистанция отдыха: ${training.relaxDistance} м`);
+    console.log(`  Общая дистанция: ${training.totalDistance} м`);
+    console.log(`  Общее время: ${training.totalTime}`);
+    console.log("--------------------------------------");
+  });
+
+  // Выводим статистику
+  console.log("\nСтатистика:");
+  console.log(`Всего тренировок: ${trainingArray.length}`);
+  console.log(`Минимальная общая дистанция: ${Math.min(...trainingArray.map(t => t.totalDistance))} м`);
+  console.log(`Максимальная общая дистанция: ${Math.max(...trainingArray.map(t => t.totalDistance))} м`);
+  console.log(`Средняя общая дистанция: ${Math.round(trainingArray.reduce((sum, t) => sum + t.totalDistance, 0) / trainingArray.length)} м`);
+
+  // Дополнительная статистика по maxTemp
+  const maxTemps = trainingArray.map(t => t.maxTemp).filter(t => t !== null) as number[];
+  console.log(`Минимальный maxTemp: ${Math.min(...maxTemps)}`);
+  console.log(`Максимальный maxTemp: ${Math.max(...maxTemps)}`);
 
   return trainingArray;
 }

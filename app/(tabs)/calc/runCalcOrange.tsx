@@ -46,7 +46,7 @@ export default function createTrainingArray_orange_run(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 5; reps <= 5; reps++) {
+    for (let reps = 3; reps <= 5; reps++) {
           
       // newTimeOptions = [480, 420, 390, 375, 360, 355, 350];
   
