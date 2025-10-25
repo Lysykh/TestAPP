@@ -291,43 +291,52 @@ export default styles = StyleSheet.create({
     alignSelf: 'center',
   },
 
-  // Стили для WorckOutMain
+  // Стили для WorckOutMain - КОМПАКТНЫЕ
   worckOutMainContainer: {
-    borderWidth: 0, 
     backgroundColor: '#FFFFFF',
-    borderRadius: 15,
+    borderRadius: 12,
+    margin: 8,
     padding: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
 
   workoutSectionTitle: {
-    padding: 10,
+    padding: 12,
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
+    color: '#333',
+    backgroundColor: '#F8F8F8',
   },
 
   workoutLevelDisplay: {
-    padding: 10,
+    padding: 8,
   },
 
+  // Компактные строки
   workoutRow: {
-    height: 60,
+    minHeight: 52,
     padding: 8,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   tagRow: {
-    height: 30,
+    minHeight: 36,
     padding: 8,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   stick: {
     width: 4,
-    height: '100%', 
+    height: '70%', 
     borderRadius: 2,
     marginRight: 8,
+    marginLeft: 2,
   },
 
   grayStick: {
@@ -340,46 +349,49 @@ export default styles = StyleSheet.create({
 
   goldenStick: {
     backgroundColor: '#D89738',
-    marginLeft: 32,
   },
 
   beigeStick: {
     backgroundColor: '#E0C491',
-    marginLeft: 32,
   },
 
   lightGrayStick: {
     backgroundColor: '#E7E7E7',
-    marginLeft: 12,
   },
 
+  // Центрированные иконки и значения
   iconsColumn: {
     width: 24,
-    height: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 8,
   },
 
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: 24,
+    width: 24,
+    height: 20,
+    marginVertical: 1,
   },
 
   valuesColumn: {
     flex: 1,
-    height: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
 
   valueText: {
-    fontSize: 14,
+    fontSize: 13,
+    color: '#333',
+    lineHeight: 16,
+    textAlignVertical: 'center',
   },
 
   singleIconContainer: {
     width: 24,
     height: '100%',
     justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 8,
   },
 
@@ -389,13 +401,13 @@ export default styles = StyleSheet.create({
   },
 
   smallIcon: {
-    width: 15, 
-    height: 15
+    width: 14, 
+    height: 14
   },
 
   mediumIcon: {
-    width: 20, 
-    height: 20
+    width: 16, 
+    height: 16
   },
 
   // Для строк с одной иконкой
@@ -404,27 +416,54 @@ export default styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
+
   scrollContainer: {
-  flex: 1, // Занимает все доступное пространство
-},
+    flex: 1,
+  },
 
-// Добавьте эти стили в ваш существующий StyleSheet
-workoutInfoContainer: {
-  padding: 10,
-  borderBottomWidth: 1,
-  borderBottomColor: '#E7E7E7',
-},
+  // Компактная информационная секция
+  workoutInfoContainer: {
+    padding: 12,
+    backgroundColor: '#FAFAFA',
+  },
 
-workoutInfoText: {
-  fontSize: 14,
-  marginBottom: 2,
-  color: '#666',
-},
+  workoutInfoText: {
+    fontSize: 12,
+    marginBottom: 2,
+    color: '#666',
+    lineHeight: 14,
+  },
 
-calcContainer: {
-  flexDirection: 'row',
-  alignItems: 'center',
-}
+  calcContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
 
+  // Убраны лишние отступы
+  workoutSection: {
+    marginBottom: 4,
+  },
+
+  workoutContent: {
+    paddingVertical: 4,
+  },
+
+  // Минимальные отступы между секциями
+  sectionSpacing: {
+    height: 8,
+  },
+
+  // Стили для значений с ваттами
+  wattValue: {
+    fontSize: 12,
+    color: '#D89738',
+    fontWeight: '500',
+  },
+
+  // Центрированный контейнер для значений
+  centeredValueContainer: {
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    height: '100%',
+  }
 });
-

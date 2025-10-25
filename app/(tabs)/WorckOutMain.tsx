@@ -13,7 +13,7 @@ import createTrainingArray_bike from './calc/bikeCalc';
 import createTrainingArray_orange_bike from './calc/bikeCalcOrange';
 import createTrainingArray_red_bike from './calc/bikeCalcRed';
 
-import { secondsToTimeString } from './SelectSportLevel';
+import { getWattsForTime, secondsToTimeString } from './SelectSportLevel';
 import styles from './styles';
 
 interface WorkoutItem {
@@ -21,11 +21,16 @@ interface WorkoutItem {
   distance: number;
   minTemp: number;
   maxTemp: number;
+  minWatt: number;
+  maxWatt: number;
   relaxTemp: number;
+  relaxWatt: number;
   reps: number;
   sets: number;
   totalDistance: number;
   relaxDistance: number;
+  watt: number;
+  temp: number;
 }
 
 interface WorckOutMainProps {
@@ -118,13 +123,13 @@ if (getSportName(sportType) === 'плавание') {
         switch (colorType) {
           case 'green':
           case 'grey':
-            return createTrainingArray_bike;
+            return (time: number) => createTrainingArray_bike(time, getWattsForTime(time));
           case 'orange':
-            return createTrainingArray_orange_bike;
+            return (time: number) => createTrainingArray_orange_bike(time, getWattsForTime(time));
           case 'red':
-            return createTrainingArray_red_bike;
+            return (time: number) => createTrainingArray_red_bike(time, getWattsForTime(time));
           default:
-            return createTrainingArray_bike;
+            return (time: number) => createTrainingArray_bike(time, getWattsForTime(time));
         }
       
       default:
@@ -161,18 +166,28 @@ if (getSportName(sportType) === 'плавание') {
     );
   }
 
-  // Функция для получения текста в зависимости от вида спорта
-  const getSportSpecificText = (baseText: string) => {
-    if (!sportType) return baseText;
-    
-    switch (sportType) {
-      case 'swim':
-        return baseText.replace('бег', 'плавание');
-      case 'bike':
-        return baseText.replace('бег', 'езда');
-      default:
-        return baseText;
+  // Функция для отображения ватт (только для велосипеда)
+  const renderWattInfo = (minWatt: number, maxWatt: number) => {
+    if (sportType === 'bike' && !isNaN(minWatt) && !isNaN(maxWatt)) {
+      return (
+        <Text style={styles.valueText}>
+          {Math.round(minWatt)} - {Math.round(maxWatt)}W
+        </Text>
+      );
     }
+    return null;
+  };
+
+  // Функция для безопасного отображения ватт
+  const renderSingleWatt = (watt: number) => {
+    if (sportType === 'bike' && !isNaN(watt)) {
+      return (
+        <Text style={styles.valueText}>
+          {Math.round(watt)}W
+        </Text>
+      );
+    }
+    return null;
   };
 
   return (
@@ -191,6 +206,11 @@ if (getSportName(sportType) === 'плавание') {
             : 'не выбрано'
           }
         </Text>
+        {sportType === 'bike' && workoutData.watt && !isNaN(workoutData.watt) && (
+          <Text style={styles.workoutInfoText}>
+            Мощность ПАНО: {Math.round(workoutData.watt)}W
+          </Text>
+        )}
       </View>
 
       {/* Первая строка с временем */}
@@ -212,12 +232,21 @@ if (getSportName(sportType) === 'плавание') {
               style={styles.smallIcon}
             />
           </View>
+          {sportType === 'bike' && (
+            <View style={styles.iconContainer}>
+              <Image 
+                source={require('../../assets/images/watt_b.png')} 
+                style={styles.smallIcon}
+              />
+            </View>
+          )}
         </View>
         <View style={styles.valuesColumn}>
           <Text style={styles.valueText}>10:00</Text>
           <Text style={styles.valueText}>
             {secondsToTimeString(workoutData.relaxTemp)}
           </Text>
+          {sportType === 'bike' && renderSingleWatt(workoutData.relaxWatt)}
         </View>
       </View>
 
@@ -262,6 +291,14 @@ if (getSportName(sportType) === 'плавание') {
               style={styles.smallIcon}
             />
           </View>
+          {sportType === 'bike' && (
+            <View style={styles.iconContainer}>
+              <Image 
+                source={require('../../assets/images/watt_b.png')} 
+                style={styles.smallIcon}
+              />
+            </View>
+          )}
           <View style={styles.iconContainer}>
             <Image 
               source={require('../../assets/images/distance.png')} 
@@ -273,6 +310,7 @@ if (getSportName(sportType) === 'плавание') {
           <Text style={styles.valueText}>
             {secondsToTimeString(workoutData.minTemp)} - {secondsToTimeString(workoutData.maxTemp)}
           </Text>
+          {sportType === 'bike' && renderWattInfo(workoutData.minWatt, workoutData.maxWatt)}
           <Text style={styles.valueText}>{workoutData.distance}m</Text>
         </View>
       </View>
@@ -287,6 +325,14 @@ if (getSportName(sportType) === 'плавание') {
               style={styles.smallIcon}
             />
           </View>
+          {sportType === 'bike' && (
+            <View style={styles.iconContainer}>
+              <Image 
+                source={require('../../assets/images/watt_b.png')} 
+                style={styles.smallIcon}
+              />
+            </View>
+          )}
           <View style={styles.iconContainer}>
             <Image 
               source={require('../../assets/images/distance.png')} 
@@ -296,6 +342,7 @@ if (getSportName(sportType) === 'плавание') {
         </View>
         <View style={styles.valuesColumn}>
           <Text style={styles.valueText}>{secondsToTimeString(workoutData.relaxTemp)}</Text>
+          {sportType === 'bike' && renderSingleWatt(workoutData.relaxWatt)}
           <Text style={styles.valueText}>{workoutData.relaxDistance}m</Text>
         </View>
       </View>
@@ -326,6 +373,14 @@ if (getSportName(sportType) === 'плавание') {
               style={styles.smallIcon}
             />
           </View>
+          {sportType === 'bike' && (
+            <View style={styles.iconContainer}>
+              <Image 
+                source={require('../../assets/images/watt_b.png')} 
+                style={styles.smallIcon}
+              />
+            </View>
+          )}
         </View>
         <View style={styles.valuesColumn}>
           <Text style={styles.valueText}>10:00</Text>
@@ -334,6 +389,7 @@ if (getSportName(sportType) === 'плавание') {
               {secondsToTimeString(workoutData.relaxTemp)}
             </Text>
           </View>
+          {sportType === 'bike' && renderSingleWatt(workoutData.relaxWatt)}
         </View>
       </View>
     </View>

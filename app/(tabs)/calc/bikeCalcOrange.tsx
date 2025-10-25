@@ -1,6 +1,4 @@
-// ОРАНЬЖЕВАЯ ЕЩЕ НЕ ИСПРАВЛЯЛ
-
-// описание калькулятора регулярный бег
+// описание калькулятора зеленый велосипед
 // 1. Ограничения дистанции от 800 до 2400 
 // 2. минимальная дистанция 3000 метров
 // 3. масимальная дистанция 10000 метров 
@@ -11,6 +9,7 @@
 // 8. количество повторений не больше 10
 // 9. количество подходов не более 5
 
+		
 // ТЕМПОВЫЕ ЗОНЫ	НОРМА	минимум	максимум
 // 1	135%	трусца	08:16
 // ОТДЫХ 2	129%	08:16	07:54
@@ -24,19 +23,24 @@ export type RunLong = {
   id: number;
   distance: number;
   temp: number | null;
+  watt: number | null;
   reps: number;
   sets: number;
   minTemp: number | null;
   maxTemp: number | null;
+  minWatt: number | null;
+  maxWatt: number | null;
   relaxTemp: number | null;
+  relaxWatt: number | null;
   relaxDistance: number | null;
   totalDistance: number;
-  totalTime:number;
+  totalTime: number;
 };
 
 // Функция для создания массива тренировок с фиксированными значениями
 export default function createTrainingArray_orange_bike(
   temp: number,
+  watt: number
 ): RunLong[] {
   const trainingArray: RunLong[] = [];
   let idCounter = 1;
@@ -45,41 +49,46 @@ export default function createTrainingArray_orange_bike(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 8; reps <= 17; reps++) {
-  
-  //  [160, 150, 140, 130, 120, 110, 105]
-  
+    for (let reps = 1; reps <= 10; reps++) {
+      
+      //  [160, 150, 140, 130, 120, 110, 105]
       let distance: number;
-  if (temp === 160) {
-    distance = 1000;
-  } else if (temp === 130) {
-    distance = 2000;
-  } else {
-    // Значение по умолчанию или для других случаев
-    distance = 3000;
-  }
+      if (temp === 160) {
+        distance = 5000;
+      } else if (temp === 130) {
+        distance = 10000;
+      } else {
+        // Значение по умолчанию или для других случаев
+        distance = 15000;
+      }
 
       for (let i = 0; i < count; i++) {
-        if (distance > 240000) {
+        if (distance > (distance * 2)) {
           break;
         }
+        
+        // Округляем relaxDistance до ближайших 100
+        const relaxDistance = Math.ceil(distance * 0.2 / 1000) * 1000;
         
         trainingArray.push({
           id: idCounter++,
           distance: distance,
           temp: temp,
+          watt: watt,
           reps: reps,
           sets: sets,
-          minTemp: temp,
-          maxTemp: temp * 1.05,
+          minTemp: temp * 1.05,
+          maxTemp: temp * 1.13,
+          minWatt: watt * 1.05,
+          maxWatt: watt * 1.13,
           relaxTemp: temp * 1.25,
-          relaxDistance: distance * 0.5,
-          totalDistance: (distance + (distance * 0.5)) * reps * sets,
-          totalTime: (distance + (distance * 0.5)) * reps * sets 
-           
+          relaxWatt: watt * 1.25,
+          relaxDistance: relaxDistance,
+          totalDistance: (distance + relaxDistance) * reps * sets,
+          totalTime: (distance + relaxDistance) * reps * sets 
         });
         
-        distance += 500;
+        distance += 1000;
       }
     }
   }
@@ -87,7 +96,7 @@ export default function createTrainingArray_orange_bike(
   // Сортируем массив по totalDistance в порядке возрастания
   trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
 
-// Дополнительная сортировка для одинаковой дистанции
+  // Дополнительная сортировка для одинаковой дистанции
   trainingArray.sort((a, b) => {
     if (a.totalDistance === b.totalDistance) {
       // Сначала сравниваем по sets (большие значения вперед)

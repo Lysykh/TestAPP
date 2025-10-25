@@ -23,11 +23,15 @@ export type RunLong = {
   id: number;
   distance: number;
   temp: number | null;
+  watt: number | null;
   reps: number;
   sets: number;
   minTemp: number | null;
   maxTemp: number | null;
+  minWatt: number | null;
+  maxWatt: number | null;
   relaxTemp: number | null;
+  relaxWatt: number | null;
   relaxDistance: number | null;
   totalDistance: number;
   totalTime: number;
@@ -36,6 +40,7 @@ export type RunLong = {
 // Функция для создания массива тренировок с фиксированными значениями
 export default function createTrainingArray_bike(
   temp: number,
+  watt: number
 ): RunLong[] {
   const trainingArray: RunLong[] = [];
   let idCounter = 1;
@@ -46,17 +51,16 @@ export default function createTrainingArray_bike(
   for (let sets = 1; sets <= 5; sets++) {
     for (let reps = 1; reps <= 10; reps++) {
       
-  //  [160, 150, 140, 130, 120, 110, 105]
-  
+      //  [160, 150, 140, 130, 120, 110, 105]
       let distance: number;
-  if (temp === 160) {
-    distance = 5000;
-  } else if (temp === 130) {
-    distance = 10000;
-  } else {
-    // Значение по умолчанию или для других случаев
-    distance = 15000;
-  }
+      if (temp === 160) {
+        distance = 5000;
+      } else if (temp === 130) {
+        distance = 10000;
+      } else {
+        // Значение по умолчанию или для других случаев
+        distance = 15000;
+      }
 
       for (let i = 0; i < count; i++) {
         if (distance > (distance * 2)) {
@@ -70,11 +74,15 @@ export default function createTrainingArray_bike(
           id: idCounter++,
           distance: distance,
           temp: temp,
+          watt: watt,
           reps: reps,
           sets: sets,
           minTemp: temp * 1.05,
           maxTemp: temp * 1.13,
+          minWatt: watt * 1.05,
+          maxWatt: watt * 1.13,
           relaxTemp: temp * 1.25,
+          relaxWatt: watt * 1.25,
           relaxDistance: relaxDistance,
           totalDistance: (distance + relaxDistance) * reps * sets,
           totalTime: (distance + relaxDistance) * reps * sets 
@@ -88,7 +96,7 @@ export default function createTrainingArray_bike(
   // Сортируем массив по totalDistance в порядке возрастания
   trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
 
-// Дополнительная сортировка для одинаковой дистанции
+  // Дополнительная сортировка для одинаковой дистанции
   trainingArray.sort((a, b) => {
     if (a.totalDistance === b.totalDistance) {
       // Сначала сравниваем по sets (большие значения вперед)
