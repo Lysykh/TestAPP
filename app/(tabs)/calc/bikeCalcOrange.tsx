@@ -37,6 +37,19 @@ export type RunLong = {
   totalTime: number;
 };
 
+// Функция для преобразования числа в формат мм:сс
+function formatTime(minutes: number | null): string {
+  if (minutes === null) return '--:--';
+  
+  const wholeMinutes = Math.floor(minutes);
+  const seconds = Math.round((minutes - wholeMinutes) * 60);
+  
+  // Форматируем секунды, чтобы всегда было 2 цифры
+  const formattedSeconds = seconds.toString().padStart(2, '0');
+  
+  return `${wholeMinutes}:${formattedSeconds}`;
+}
+
 // Функция для создания массива тренировок с фиксированными значениями
 export default function createTrainingArray_orange_bike(
   temp: number,
@@ -115,6 +128,35 @@ export default function createTrainingArray_orange_bike(
   trainingArray.forEach((training, index) => {
     training.id = index + 1;
   });
+
+  // Вывод первых 50 сгенерированных тренировок на консоль
+  console.log("Первые 50 сгенерированных тренировок (ОРАНЖЕВЫЙ ВЕЛОСИПЕД):");
+  console.log("=================================");
+  
+  // Берем только первые 50 элементов
+  const first50Trainings = trainingArray.slice(0, 50);
+  
+  first50Trainings.forEach(training => {
+    console.log(`ID: ${training.id}`);
+    console.log(`  Дистанция: ${training.distance}м`);
+    console.log(`  Темп: ${formatTime(training.temp)} мин/км`);
+    console.log(`  Ватты: ${training.watt}W`);
+    console.log(`  Повторения: ${training.reps}`);
+    console.log(`  Подходы: ${training.sets}`);
+    console.log(`  Мин. темп: ${formatTime(training.minTemp)} мин/км`);
+    console.log(`  Макс. темп: ${formatTime(training.maxTemp)} мин/км`);
+    console.log(`  Мин. ватты: ${training.minWatt}W`);
+    console.log(`  Макс. ватты: ${training.maxWatt}W`);
+    console.log(`  Темп отдыха: ${formatTime(training.relaxTemp)} мин/км`);
+    console.log(`  Ватты отдыха: ${training.relaxWatt}W`);
+    console.log(`  Дистанция отдыха: ${training.relaxDistance}м`);
+    console.log(`  Общая дистанция: ${training.totalDistance}м`);
+    console.log(`  Общее время: ${training.totalTime} сек`);
+    console.log("---------------------------------");
+  });
+
+  console.log(`Всего сгенерировано тренировок: ${trainingArray.length}`);
+  console.log(`Выведено первых: ${first50Trainings.length}`);
 
   return trainingArray;
 }

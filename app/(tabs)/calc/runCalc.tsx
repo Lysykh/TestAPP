@@ -124,11 +124,14 @@ export default function createTrainingArray_bike(
     training.id = index + 1;
   });
 
-  // Выводим все тренировки в консоль
-  console.log("Все собранные тренировки:");
+  // Выводим первые 50 тренировок в консоль
+  console.log("Первые 50 тренировок:");
   console.log("======================================");
   
-  trainingArray.forEach(training => {
+  // Берем только первые 50 элементов
+  const first50Trainings = trainingArray.slice(0, 50);
+  
+  first50Trainings.forEach(training => {
     console.log(`ID: ${training.id}`);
     console.log(`  Дистанция: ${training.distance} м`);
     console.log(`  Темп: ${training.temp}`);
@@ -146,6 +149,7 @@ export default function createTrainingArray_bike(
   // Выводим статистику
   console.log("\nСтатистика:");
   console.log(`Всего тренировок: ${trainingArray.length}`);
+  console.log(`Выведено первых: ${first50Trainings.length}`);
   console.log(`Минимальная общая дистанция: ${Math.min(...trainingArray.map(t => t.totalDistance))} м`);
   console.log(`Максимальная общая дистанция: ${Math.max(...trainingArray.map(t => t.totalDistance))} м`);
   console.log(`Средняя общая дистанция: ${Math.round(trainingArray.reduce((sum, t) => sum + t.totalDistance, 0) / trainingArray.length)} м`);

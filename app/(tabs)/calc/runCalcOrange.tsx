@@ -35,6 +35,19 @@ export type RunLong = {
   totalTime:number;
 };
 
+// Функция для преобразования числа в формат мм:сс
+function formatTime(minutes: number | null): string {
+  if (minutes === null) return '--:--';
+  
+  const wholeMinutes = Math.floor(minutes);
+  const seconds = Math.round((minutes - wholeMinutes) * 60);
+  
+  // Форматируем секунды, чтобы всегда было 2 цифры
+  const formattedSeconds = seconds.toString().padStart(2, '0');
+  
+  return `${wholeMinutes}:${formattedSeconds}`;
+}
+
 // Функция для создания массива тренировок с фиксированными значениями
 export default function createTrainingArray_orange_run(
   temp: number,
@@ -51,14 +64,14 @@ export default function createTrainingArray_orange_run(
       // newTimeOptions = [480, 420, 390, 375, 360, 355, 350];
   
       let distance: number;
-  if (temp === 480) {
-    distance = 500;
-  } else if (temp === 360) {
-    distance = 1000;
-  } else {
-    // Значение по умолчанию или для других случаев
-    distance = 1500;
-  }
+      if (temp === 480) {
+        distance = 500;
+      } else if (temp === 360) {
+        distance = 1000;
+      } else {
+        // Значение по умолчанию или для других случаев
+        distance = 1500;
+      }
 
       for (let i = 0; i < count; i++) {
         if (distance > 240000) {
@@ -88,7 +101,7 @@ export default function createTrainingArray_orange_run(
   // Сортируем массив по totalDistance в порядке возрастания
   trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
 
-// Дополнительная сортировка для одинаковой дистанции
+  // Дополнительная сортировка для одинаковой дистанции
   trainingArray.sort((a, b) => {
     if (a.totalDistance === b.totalDistance) {
       // Сначала сравниваем по sets (большие значения вперед)
@@ -107,6 +120,31 @@ export default function createTrainingArray_orange_run(
   trainingArray.forEach((training, index) => {
     training.id = index + 1;
   });
+
+  // Вывод первых 50 сгенерированных тренировок на консоль
+  console.log("Первые 50 сгенерированных тренировок (ОРАНЖЕВАЯ):");
+  console.log("=================================");
+  
+  // Берем только первые 50 элементов
+  const first50Trainings = trainingArray.slice(0, 50);
+  
+  first50Trainings.forEach(training => {
+    console.log(`ID: ${training.id}`);
+    console.log(`  Дистанция: ${training.distance}м`);
+    console.log(`  Темп: ${formatTime(training.temp)} мин/км`);
+    console.log(`  Повторения: ${training.reps}`);
+    console.log(`  Подходы: ${training.sets}`);
+    console.log(`  Мин. темп: ${formatTime(training.minTemp)} мин/км`);
+    console.log(`  Макс. темп: ${formatTime(training.maxTemp)} мин/км`);
+    console.log(`  Темп отдыха: ${formatTime(training.relaxTemp)} мин/км`);
+    console.log(`  Дистанция отдыха: ${training.relaxDistance}м`);
+    console.log(`  Общая дистанция: ${training.totalDistance}м`);
+    console.log(`  Общее время: ${training.totalTime} сек`);
+    console.log("---------------------------------");
+  });
+
+  console.log(`Всего сгенерировано тренировок: ${trainingArray.length}`);
+  console.log(`Выведено первых: ${first50Trainings.length}`);
 
   return trainingArray;
 }

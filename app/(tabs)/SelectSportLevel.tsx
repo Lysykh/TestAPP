@@ -21,13 +21,13 @@ const secondsToTimeString = (totalSeconds: number): string => {
 // Альтернативный вариант с фиксированными значениями ватт
 const getWattsForTime = (timeInSeconds: number): number => {
   const wattsMap: { [key: number]: number } = {
-    160: 180,
-    150: 200,
-    140: 220,
-    130: 240,
-    120: 260,
-    110: 280,
-    105: 300
+    160: 100,
+    150: 120,
+    140: 150,
+    130: 190,
+    120: 240,
+    110: 300,
+    105: 400
   };
   
   return wattsMap[timeInSeconds] || 0;
