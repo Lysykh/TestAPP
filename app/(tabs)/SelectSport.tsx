@@ -240,12 +240,15 @@ function SportSelect({ onSportChange, onColorChange }: SportSelectProps) {
 
         {/* Дополнительные элементы для демонстрации прокрутки */}
         <View style={styles.sportItemContainer}>
-          <Text>Дополнительный вид спорта 1</Text>
+          <ImageBackground
+            source={require('./calendar.png')}
+            style={styles.sportItemContainer}
+            resizeMode="contain"
+          >
+          </ImageBackground>
         </View>
         
-        <View style={styles.sportItemContainer}>
-          <Text>Дополнительный вид спорта 2</Text>
-        </View>
+      
       </ScrollView>
       
    
