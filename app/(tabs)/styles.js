@@ -310,7 +310,7 @@ export default styles = StyleSheet.create({
   },
 
   workoutRow: {
-    height: 90,
+   
     padding: 8,
     flexDirection: 'row',
     alignItems: 'center'
