@@ -59,7 +59,7 @@ export default function createTrainingArray_orange_swim(
 
   // Сначала собираем все тренировки
   for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 4; reps <= 14; reps++) {
+    for (let reps = 2; reps <= 14; reps++) {
       
       
           //  newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
