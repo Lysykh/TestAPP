@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Text, View } from 'react-native';
 
 import createTrainingArray_run from './calc/runCalc';
@@ -41,6 +41,13 @@ interface WorckOutMainProps {
   selectedTimeSeconds: number | null;
 }
 
+// Интерфейс для данных с бэкенда
+interface BackendItem {
+  id: number;
+  name: string;
+  age: string;
+}
+
 const WorckOutMain = ({ 
   workoutLevel, 
   setWorkoutLevel, 
@@ -49,6 +56,84 @@ const WorckOutMain = ({
   selectedTimeSeconds 
 }: WorckOutMainProps) => {
   
+  // Состояние для данных с бэкенда
+  const [backendData, setBackendData] = useState<BackendItem | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Функция для получения данных с бэкенда
+  const fetchBackendData = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // ВОТ ЭТО ЗАБОР 
+      const response = await fetch('http://127.0.0.1:811/get-items/2', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Data from backend:', data);
+      setBackendData(data);
+      
+    } catch (err) {
+      console.error('Error fetching backend data:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Состояние для данных с бэкенда GIGA
+  const [backendDataGiga, setBackendDataGiga] = useState<BackendItem | null>(null);
+  const [loadingGiga, setLoadingGiga] = useState<boolean>(false);
+  const [errorGiga, setErrorGiga] = useState<string | null>(null);
+
+
+  // Функция для получения данных с бэкенда GIGA
+  const fetchBackendDataGiga = async () => {
+    setLoadingGiga(true);
+    setErrorGiga(null);
+    
+    try {
+      // ВОТ ЭТО ЗАБОР 
+      const response = await fetch('http://127.0.0.1:811/request_gigachat2/"Привет как дела?"', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Data from backend:', data);
+      setBackendDataGiga (data);
+      
+    } catch (err) {
+      console.error('Error fetching backend data:', err);
+      setErrorGiga(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setLoadingGiga(false);
+    }
+  };
+
+
+  // Загружаем данные при монтировании компонента
+  useEffect(() => {
+    fetchBackendData();
+  }, []);
 
   const getSportName = (sport: string | null): string => {
     if (!sport) return 'не выбран';
@@ -64,11 +149,10 @@ const WorckOutMain = ({
     }
   };
 
-let razryad = 1000;
-if (getSportName(sportType) === 'плавание') {
+  let razryad = 1000;
+  if (getSportName(sportType) === 'плавание') {
     razryad = 100;
-}
-
+  }
 
   const getColorName = (color: string | null): string => {
     if (!color) return 'не выбран';
@@ -192,6 +276,28 @@ if (getSportName(sportType) === 'плавание') {
 
   return (
     <View style={styles.worckOutMainContainer}>
+      
+      {/* Блок с данными из бэкенда */}
+      <View style={styles.backendDataContainer}>
+        <Text style={styles.workoutSectionTitle}>ДАННЫЕ ИЗ БАЗЫ ДАННЫХ</Text>
+        {loading ? (
+          <Text style={styles.backendText}>Загрузка данных...</Text>
+        ) : error ? (
+          <Text style={styles.backendError}>Ошибка: {error}</Text>
+        ) : backendData ? (
+          <View style={styles.backendInfoContainer}>
+            <Text style={styles.backendText}>ID: {backendData.id}</Text>
+            <Text style={styles.backendText}>Name: {backendData.name}</Text>
+            <Text style={styles.backendText}>Age: {backendData.age}</Text>
+            {/* ЭТО ОТВЕТ GIGACHAT */}
+            <Text style={styles.backendText}>Age: {backendDataGiga}</Text>
+
+          </View>
+        ) : (
+          <Text style={styles.backendText}>Данные не получены</Text>
+        )}
+      </View>
+
       {/* Информация о тренировке */}
       <Text style={styles.workoutSectionTitle}>О ТРЕНИРОВКЕ</Text>
       <View style={styles.workoutInfoContainer}>
@@ -212,8 +318,6 @@ if (getSportName(sportType) === 'плавание') {
           </Text>
         )}
       </View>
-
-      {/* Первая строка с временем */}
 
       <Text style={styles.workoutSectionTitle}>РАЗМИНКА</Text>
 
@@ -394,6 +498,32 @@ if (getSportName(sportType) === 'плавание') {
       </View>
     </View>
   );
+};
+
+// Добавляем стили для бэкенд данных
+const extendedStyles = {
+  ...styles,
+  backendDataContainer: {
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: '#e8f5e8',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#4caf50',
+  },
+  backendInfoContainer: {
+    marginTop: 10,
+  },
+  backendText: {
+    fontSize: 14,
+    color: '#2e7d32',
+    marginBottom: 5,
+  },
+  backendError: {
+    fontSize: 14,
+    color: '#d32f2f',
+    marginBottom: 5,
+  },
 };
 
 export default WorckOutMain;
