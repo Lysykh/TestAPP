@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import createTrainingArray_run from './calc/runCalc';
 import createTrainingArray_orange_run from './calc/runCalcOrange';
@@ -61,13 +61,17 @@ const WorckOutMain = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Состояние для ответа GigaChat
+  const [gigaResponse, setGigaResponse] = useState<string>("");
+  const [loadingGiga, setLoadingGiga] = useState<boolean>(false);
+  const [errorGiga, setErrorGiga] = useState<string | null>(null);
+
   // Функция для получения данных с бэкенда
   const fetchBackendData = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // ВОТ ЭТО ЗАБОР 
       const response = await fetch('http://127.0.0.1:811/get-items/2', {
         method: 'GET',
         headers: {
@@ -92,21 +96,17 @@ const WorckOutMain = ({
     }
   };
 
-  // Состояние для данных с бэкенда GIGA
-  const [backendDataGiga, setBackendDataGiga] = useState<BackendItem | null>(null);
-  const [loadingGiga, setLoadingGiga] = useState<boolean>(false);
-  const [errorGiga, setErrorGiga] = useState<string | null>(null);
-
-
-  // Функция для получения данных с бэкенда GIGA
-  const fetchBackendDataGiga = async () => {
+  // Функция для вызова GigaChat
+  const callGigaChat = async () => {
     setLoadingGiga(true);
     setErrorGiga(null);
+    setGigaResponse("");
     
     try {
-      // ВОТ ЭТО ЗАБОР 
-      const response = await fetch('http://127.0.0.1:811/request_gigachat2/"Привет как дела?"', {
-        method: 'GET',
+      // ПРАВИЛЬНЫЙ POST запрос с промптом в URL
+      const promptText = "Привет как дела?";
+      const response = await fetch(`http://127.0.0.1:811/request_gigachat2/${encodeURIComponent(promptText)}`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -114,21 +114,21 @@ const WorckOutMain = ({
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('Data from backend:', data);
-      setBackendDataGiga (data);
+      // Получаем ответ как текст (GigaChat возвращает строку)
+      const responseText = await response.text();
+      console.log('Ответ от GigaChat:', responseText);
+      setGigaResponse(responseText);
       
     } catch (err) {
-      console.error('Error fetching backend data:', err);
-      setErrorGiga(err instanceof Error ? err.message : 'Unknown error occurred');
+      console.error('Ошибка при вызове GigaChat:', err);
+      setErrorGiga(err instanceof Error ? err.message : 'Неизвестная ошибка');
     } finally {
       setLoadingGiga(false);
     }
   };
-
 
   // Загружаем данные при монтировании компонента
   useEffect(() => {
@@ -276,27 +276,6 @@ const WorckOutMain = ({
 
   return (
     <View style={styles.worckOutMainContainer}>
-      
-      {/* Блок с данными из бэкенда */}
-      <View style={styles.backendDataContainer}>
-        <Text style={styles.workoutSectionTitle}>ДАННЫЕ ИЗ БАЗЫ ДАННЫХ</Text>
-        {loading ? (
-          <Text style={styles.backendText}>Загрузка данных...</Text>
-        ) : error ? (
-          <Text style={styles.backendError}>Ошибка: {error}</Text>
-        ) : backendData ? (
-          <View style={styles.backendInfoContainer}>
-            <Text style={styles.backendText}>ID: {backendData.id}</Text>
-            <Text style={styles.backendText}>Name: {backendData.name}</Text>
-            <Text style={styles.backendText}>Age: {backendData.age}</Text>
-            {/* ЭТО ОТВЕТ GIGACHAT */}
-            <Text style={styles.backendText}>Age: {backendDataGiga}</Text>
-
-          </View>
-        ) : (
-          <Text style={styles.backendText}>Данные не получены</Text>
-        )}
-      </View>
 
       {/* Информация о тренировке */}
       <Text style={styles.workoutSectionTitle}>О ТРЕНИРОВКЕ</Text>
@@ -496,33 +475,109 @@ const WorckOutMain = ({
           {sportType === 'bike' && renderSingleWatt(workoutData.relaxWatt)}
         </View>
       </View>
+
+      {/* Блок с данными из бэкенда (ПЕРЕНЕСЕН В КОНЕЦ) */}
+      <View style={extendedStyles.backendDataContainer}>
+        <Text style={styles.workoutSectionTitle}>ДАННЫЕ ИЗ БАЗЫ ДАННЫХ</Text>
+        
+        {/* Кнопка для вызова GigaChat */}
+        <TouchableOpacity 
+          style={extendedStyles.gigaButton}
+          onPress={callGigaChat}
+          disabled={loadingGiga}
+        >
+          <Text style={extendedStyles.gigaButtonText}>
+            {loadingGiga ? 'Загрузка...' : 'Спросить у GigaChat'}
+          </Text>
+        </TouchableOpacity>
+        
+        {loading ? (
+          <Text style={extendedStyles.backendText}>Загрузка данных...</Text>
+        ) : error ? (
+          <Text style={extendedStyles.backendError}>Ошибка: {error}</Text>
+        ) : backendData ? (
+          <View style={extendedStyles.backendInfoContainer}>
+            <Text style={extendedStyles.backendText}>ID: {backendData.id}</Text>
+            <Text style={extendedStyles.backendText}>Name: {backendData.name}</Text>
+            <Text style={extendedStyles.backendText}>Age: {backendData.age}</Text>
+            
+            {/* Блок ответа GigaChat */}
+            <View style={extendedStyles.gigaResponseContainer}>
+              <Text style={styles.workoutSectionTitle}>ОТВЕТ GIGACHAT:</Text>
+              {loadingGiga ? (
+                <Text style={extendedStyles.backendText}>Запрашиваю ответ...</Text>
+              ) : errorGiga ? (
+                <Text style={extendedStyles.backendError}>Ошибка: {errorGiga}</Text>
+              ) : gigaResponse ? (
+                <Text style={extendedStyles.gigaResponseText}>{gigaResponse}</Text>
+              ) : (
+                <Text style={extendedStyles.backendText}>Нажмите кнопку выше</Text>
+              )}
+            </View>
+          </View>
+        ) : (
+          <Text style={extendedStyles.backendText}>Данные не получены</Text>
+        )}
+      </View>
     </View>
   );
 };
 
-// Добавляем стили для бэкенд данных
+// Добавляем стили для бэкенд данных (серо-белая палитра, оранжевая кнопка)
 const extendedStyles = {
   ...styles,
   backendDataContainer: {
     marginBottom: 20,
     padding: 15,
-    backgroundColor: '#e8f5e8',
+    backgroundColor: '#f8f9fa', // Светло-серый фон
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#4caf50',
+    borderColor: '#dee2e6', // Серый бордер
   },
   backendInfoContainer: {
     marginTop: 10,
   },
   backendText: {
     fontSize: 14,
-    color: '#2e7d32',
+    color: '#495057', // Темно-серый текст
     marginBottom: 5,
   },
   backendError: {
     fontSize: 14,
-    color: '#d32f2f',
+    color: '#dc3545', // Красный для ошибок
     marginBottom: 5,
+  },
+  gigaButton: {
+    backgroundColor: '#fd7e14', // Оранжевый цвет как в теме
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: 'center',
+    elevation: 2, // Тень для Android
+    shadowColor: '#000', // Тень для iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  gigaButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  gigaResponseContainer: {
+    marginTop: 15,
+    padding: 12,
+    backgroundColor: '#ffffff', // Белый фон
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ced4da', // Светло-серый бордер
+  },
+  gigaResponseText: {
+    fontSize: 14,
+    color: '#212529', // Очень темно-серый почти черный
+    fontStyle: 'italic',
+    marginTop: 5,
+    lineHeight: 20,
   },
 };
 
