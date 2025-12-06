@@ -98,13 +98,32 @@ const WorckOutMain = ({
 
   // Функция для вызова GigaChat
   const callGigaChat = async () => {
+    // Проверяем, что workoutData существует
+    if (!workoutData) {
+      setErrorGiga("Нет данных тренировки для анализа");
+      return;
+    }
+    
     setLoadingGiga(true);
     setErrorGiga(null);
     setGigaResponse("");
     
     try {
-      // ПРАВИЛЬНЫЙ POST запрос с промптом в URL
-      const promptText = "напиши что ты думаешь по поводу тренировки бега не более 3х предложений";
+      // Создаем промпт с данными тренировки
+      const promptText = `Ты профессиональный тренер, смотришь тренировку своего атлета, которая состоит из: 
+- Вид спорта: ${getSportName(sportType)}
+- Общая дистанция: ${workoutData.totalDistance}м
+- Количество подходов: ${workoutData.sets}
+- Количество повторений в подходе: ${workoutData.reps}
+- Темповая работа: ${secondsToTimeString(workoutData.minTemp)} - ${secondsToTimeString(workoutData.maxTemp)}
+- Дистанция темпового отрезка: ${workoutData.distance}м
+- Отдых между повторениями: ${secondsToTimeString(workoutData.relaxTemp)} на ${workoutData.relaxDistance}м
+- Отдых между подходами: 3 минуты
+
+Проанализируй данную тренировку с точки зрения профессионального тренера. повтори кажды элемент тренировки и дай одно или два профессиональных комментария. Не более 100 слов` ;
+      
+      console.log('Промпт для GigaChat:', promptText);
+      
       const response = await fetch(`http://127.0.0.1:811/request_gigachat2/${encodeURIComponent(promptText)}`, {
         method: 'POST',
         headers: {
@@ -449,7 +468,7 @@ const WorckOutMain = ({
               source={require('../../assets/images/time_b.png')} 
               style={styles.smallIcon}
             />
-          </View>
+          </View> 
           <View style={styles.iconContainer}>
             <Image 
               source={require('../../assets/images/tempo_b.png')} 
