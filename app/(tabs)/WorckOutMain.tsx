@@ -104,7 +104,7 @@ const WorckOutMain = ({
     
     try {
       // ПРАВИЛЬНЫЙ POST запрос с промптом в URL
-      const promptText = "Привет как дела?";
+      const promptText = "напиши что ты думаешь по поводу тренировки бега не более 3х предложений";
       const response = await fetch(`http://127.0.0.1:811/request_gigachat2/${encodeURIComponent(promptText)}`, {
         method: 'POST',
         headers: {
