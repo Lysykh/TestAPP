@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import createTrainingArray_run from './calc/runCalc';
-import createTrainingArray_orange_run from './calc/runCalcOrange';
-import createTrainingArray_red_run from './calc/runCalcRed';
+// Импорт функций расчетов
+import createTrainingArray_run from "./calc/runCalc";
+import createTrainingArray_orange_run from "./calc/runCalcOrange";
+import createTrainingArray_red_run from "./calc/runCalcRed";
 
-import createTrainingArray_swim from './calc/swimCalc';
-import createTrainingArray_orange_swim from './calc/swimCalcOrange';
-import createTrainingArray_red_swim from './calc/swimCalcRed';
+import createTrainingArray_swim from "./calc/swimCalc";
+import createTrainingArray_orange_swim from "./calc/swimCalcOrange";
+import createTrainingArray_red_swim from "./calc/swimCalcRed";
 
-import createTrainingArray_bike from './calc/bikeCalc';
-import createTrainingArray_orange_bike from './calc/bikeCalcOrange';
-import createTrainingArray_red_bike from './calc/bikeCalcRed';
+import createTrainingArray_bike from "./calc/bikeCalc";
+import createTrainingArray_orange_bike from "./calc/bikeCalcOrange";
+import createTrainingArray_red_bike from "./calc/bikeCalcRed";
 
-import { getWattsForTime, secondsToTimeString } from './SelectSportLevel';
-import styles from './styles';
+import { getWattsForTime, secondsToTimeString } from "./SelectSportLevel";
 
 interface WorkoutItem {
   id: number;
@@ -41,75 +41,61 @@ interface WorckOutMainProps {
   selectedTimeSeconds: number | null;
 }
 
-// Интерфейс для данных с бэкенда
 interface BackendItem {
   id: number;
   name: string;
   age: string;
 }
 
-const WorckOutMain = ({ 
-  workoutLevel, 
-  setWorkoutLevel, 
-  sportType, 
-  colorType, 
-  selectedTimeSeconds 
+// Конфигурация временных порогов для разных видов спорта
+const SPORT_TIME_THRESHOLDS = {
+  swim: {
+    high: 149,
+    medium: 119,
+  },
+  run: {
+    high: 389,
+    medium: 329,
+  },
+  bike: {
+    high: 159,
+    medium: 129,
+  },
+} as const;
+
+const WorckOutMain = ({
+  workoutLevel,
+  sportType,
+  colorType,
+  selectedTimeSeconds,
 }: WorckOutMainProps) => {
-  
-  // Состояние для данных с бэкенда
   const [backendData, setBackendData] = useState<BackendItem | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Состояние для ответа GigaChat
   const [gigaResponse, setGigaResponse] = useState<string>("");
   const [loadingGiga, setLoadingGiga] = useState<boolean>(false);
-  const [errorGiga, setErrorGiga] = useState<string | null>(null);
 
-  // Функция для получения данных с бэкенда
   const fetchBackendData = async () => {
     setLoading(true);
-    setError(null);
-    
     try {
-      const response = await fetch('http://127.0.0.1:811/get-items/2', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
+      const response = await fetch("https://crystal-christmas.ru/get-items/2");
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
-      console.log('Data from backend:', data);
       setBackendData(data);
-      
     } catch (err) {
-      console.error('Error fetching backend data:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      console.error("Error fetching backend data:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Функция для вызова GigaChat
   const callGigaChat = async () => {
-    // Проверяем, что workoutData существует
-    if (!workoutData) {
-      setErrorGiga("Нет данных тренировки для анализа");
-      return;
-    }
-    
+    if (!workoutData) return;
+
     setLoadingGiga(true);
-    setErrorGiga(null);
     setGigaResponse("");
-    
+
     try {
-      // Создаем промпт с данными тренировки
       const promptText = `Ты профессиональный тренер, смотришь тренировку своего атлета, которая состоит из: 
 - Вид спорта: ${getSportName(sportType)}
 - Общая дистанция: ${workoutData.totalDistance}м
@@ -120,483 +106,454 @@ const WorckOutMain = ({
 - Отдых между повторениями: ${secondsToTimeString(workoutData.relaxTemp)} на ${workoutData.relaxDistance}м
 - Отдых между подходами: 3 минуты
 
-Проанализируй данную тренировку с точки зрения профессионального тренера. повтори кажды элемент тренировки и дай одно или два профессиональных комментария. Не более 100 слов` ;
-      
-      console.log('Промпт для GigaChat:', promptText);
-      
-      const response = await fetch(`http://127.0.0.1:811/request_gigachat2/${encodeURIComponent(promptText)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+Проанализируй данную тренировку с точки зрения профессионального тренера. повтори кажды элемент тренировки и дай одно или два профессиональных комментария. Не более 100 слов`;
+
+      const response = await fetch(
+        `https://crystal-christmas.ru/request_gigachat2/${encodeURIComponent(promptText)}`,
+        {
+          method: "POST",
         },
-      });
+      );
 
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
-      }
-
-      // Получаем ответ как текст (GigaChat возвращает строку)
       const responseText = await response.text();
-      console.log('Ответ от GigaChat:', responseText);
       setGigaResponse(responseText);
-      
     } catch (err) {
-      console.error('Ошибка при вызове GigaChat:', err);
-      setErrorGiga(err instanceof Error ? err.message : 'Неизвестная ошибка');
+      console.error("Ошибка при вызове GigaChat:", err);
     } finally {
       setLoadingGiga(false);
     }
   };
 
-  // Загружаем данные при монтировании компонента
   useEffect(() => {
     fetchBackendData();
   }, []);
 
   const getSportName = (sport: string | null): string => {
-    if (!sport) return 'не выбран';
-    switch (sport) {
-      case 'swim':
-        return 'плавание';
-      case 'run':
-        return 'бег';
-      case 'bike':
-        return 'велосипед';
-      default:
-        return sport;
-    }
+    if (!sport) return "не выбран";
+    const sports: { [key: string]: string } = {
+      swim: "плавание",
+      run: "бег",
+      bike: "велосипед",
+    };
+    return sports[sport] || sport;
   };
-
-  let razryad = 1000;
-  if (getSportName(sportType) === 'плавание') {
-    razryad = 100;
-  }
 
   const getColorName = (color: string | null): string => {
-    if (!color) return 'не выбран';
-    switch (color) {
-      case 'orange':
-        return 'оранжевый';
-      case 'green':
-        return 'зеленый';
-      case 'red':
-        return 'красный';
-      case 'grey':
-        return 'серый';
-      default:
-        return color;
-    }
+    if (!color) return "не выбран";
+    const colors: { [key: string]: string } = {
+      orange: "оранжевый",
+      green: "зеленый",
+      red: "красный",
+      grey: "серый",
+    };
+    return colors[color] || color;
   };
 
-  // Функция для выбора соответствующей функции расчета в зависимости от вида спорта и цвета
   const getTrainingArrayFunction = () => {
-    if (!sportType || selectedTimeSeconds === null) {
-      return () => [];
-    }
+    if (!sportType || selectedTimeSeconds === null) return () => [];
 
-    switch (sportType) {
-      case 'run':
-        switch (colorType) {
-          case 'green':
-          case 'grey':
-            return createTrainingArray_run;
-          case 'orange':
-            return createTrainingArray_orange_run;
-          case 'red':
-            return createTrainingArray_red_run;
-          default:
-            return createTrainingArray_run;
-        }
-      
-      case 'swim':
-        switch (colorType) {
-          case 'green':
-          case 'grey':
-            return createTrainingArray_swim;
-          case 'orange':
-            return createTrainingArray_orange_swim;
-          case 'red':
-            return createTrainingArray_red_swim;
-          default:
-            return createTrainingArray_swim;
-        }
-      
-      case 'bike':
-        switch (colorType) {
-          case 'green':
-          case 'grey':
-            return (time: number) => createTrainingArray_bike(time, getWattsForTime(time));
-          case 'orange':
-            return (time: number) => createTrainingArray_orange_bike(time, getWattsForTime(time));
-          case 'red':
-            return (time: number) => createTrainingArray_red_bike(time, getWattsForTime(time));
-          default:
-            return (time: number) => createTrainingArray_bike(time, getWattsForTime(time));
-        }
-      
-      default:
-        // Для неизвестных видов спорта используем бег как fallback
-        return createTrainingArray_run;
-    }
+    const sportFunctions: { [key: string]: any } = {
+      run: {
+        green: createTrainingArray_run,
+        grey: createTrainingArray_run,
+        orange: createTrainingArray_orange_run,
+        red: createTrainingArray_red_run,
+      },
+      swim: {
+        green: createTrainingArray_swim,
+        grey: createTrainingArray_swim,
+        orange: createTrainingArray_orange_swim,
+        red: createTrainingArray_red_swim,
+      },
+      bike: {
+        green: (time: number) =>
+          createTrainingArray_bike(time, getWattsForTime(time)),
+        grey: (time: number) =>
+          createTrainingArray_bike(time, getWattsForTime(time)),
+        orange: (time: number) =>
+          createTrainingArray_orange_bike(time, getWattsForTime(time)),
+        red: (time: number) =>
+          createTrainingArray_red_bike(time, getWattsForTime(time)),
+      },
+    };
+
+    return sportFunctions[sportType]?.[colorType || "green"] || (() => []);
   };
 
-  // Получаем соответствующую функцию и создаем массив тренировок
   let trainingArray: WorkoutItem[] = [];
-  
   if (selectedTimeSeconds !== null && sportType) {
     const createTrainingArrayFunction = getTrainingArrayFunction();
     trainingArray = createTrainingArrayFunction(selectedTimeSeconds);
   }
 
-  // Находим элемент тренировки по workoutLevel
-  const workoutData = trainingArray.find(item => item.id === workoutLevel);
+  const workoutData = trainingArray.find((item) => {
+    if (!sportType || selectedTimeSeconds === null) return false;
 
-  // Если данные не найдены, показываем сообщение
+    const thresholds =
+      SPORT_TIME_THRESHOLDS[sportType as keyof typeof SPORT_TIME_THRESHOLDS];
+
+    if (!thresholds) return item.id === workoutLevel;
+
+    let targetId = workoutLevel;
+
+    if (selectedTimeSeconds > thresholds.high) {
+      targetId = workoutLevel;
+    } else if (selectedTimeSeconds > thresholds.medium) {
+      targetId = workoutLevel + 2;
+    } else {
+      targetId = workoutLevel + 5;
+    }
+
+    return item.id === targetId;
+  });
+
   if (!workoutData) {
     return (
-      <View style={styles.worckOutMainContainer}>
-        <Text style={styles.workoutSectionTitle}>Данные тренировки не найдены</Text>
-        <Text>Пожалуйста, выберите время и уровень тренировки</Text>
-        <Text>Уровень: {workoutLevel}</Text>
-        <Text>Спорт: {getSportName(sportType)}</Text>
-        <Text>Цвет: {getColorName(colorType)}</Text>
-        <Text>Время на 100м: {selectedTimeSeconds !== null 
-          ? secondsToTimeString(selectedTimeSeconds) 
-          : 'не выбрано'
-        }</Text>
+      <View style={simpleStyles.container}>
+        <Text style={simpleStyles.title}>Данные тренировки не найдены</Text>
+        <Text style={simpleStyles.text}>
+          Пожалуйста, выберите время и уровень тренировки
+        </Text>
       </View>
     );
   }
 
-  // Функция для отображения ватт (только для велосипеда)
-  const renderWattInfo = (minWatt: number, maxWatt: number) => {
-    if (sportType === 'bike' && !isNaN(minWatt) && !isNaN(maxWatt)) {
-      return (
-        <Text style={styles.valueText}>
-          {Math.round(minWatt)} - {Math.round(maxWatt)}W
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  // Функция для безопасного отображения ватт
-  const renderSingleWatt = (watt: number) => {
-    if (sportType === 'bike' && !isNaN(watt)) {
-      return (
-        <Text style={styles.valueText}>
-          {Math.round(watt)}W
-        </Text>
-      );
-    }
-    return null;
-  };
+  const razryad = getSportName(sportType) === "плавание" ? 100 : 1000;
+  const totalDuration = selectedTimeSeconds
+    ? (workoutData.totalDistance / razryad) * selectedTimeSeconds
+    : 0;
 
   return (
-    <View style={styles.worckOutMainContainer}>
-
-      {/* Информация о тренировке */}
-      <Text style={styles.workoutSectionTitle}>О ТРЕНИРОВКЕ</Text>
-      <View style={styles.workoutInfoContainer}>
-        <Text style={styles.workoutInfoText}>Уровень: {workoutLevel}</Text>
-        <Text style={styles.workoutInfoText}>Спорт: {getSportName(sportType)}</Text>
-        <Text style={styles.workoutInfoText}>Цвет: {getColorName(colorType)}</Text>
-        <Text style={styles.workoutInfoText}>Общая дистанция: {workoutData.totalDistance}</Text>
-        <Text style={styles.workoutInfoText}>Общая продолжительность: {secondsToTimeString(workoutData.totalDistance / razryad * selectedTimeSeconds)} </Text>
-        <Text style={styles.workoutInfoText}>
-          Темп ПАНО: {selectedTimeSeconds !== null 
-            ? secondsToTimeString(selectedTimeSeconds) 
-            : 'не выбрано'
-          }
-        </Text>
-        {sportType === 'bike' && workoutData.watt && !isNaN(workoutData.watt) && (
-          <Text style={styles.workoutInfoText}>
-            Мощность ПАНО: {Math.round(workoutData.watt)}W
+    <ScrollView style={simpleStyles.container}>
+      {/* Заголовок тренировки */}
+      <View style={simpleStyles.section}>
+        <Text style={simpleStyles.sectionTitle}>О ТРЕНИРОВКЕ</Text>
+        <View style={simpleStyles.infoRow}>
+          <Text style={simpleStyles.label}>Уровень:</Text>
+          <Text style={simpleStyles.value}>{workoutLevel}</Text>
+        </View>
+        <View style={simpleStyles.infoRow}>
+          <Text style={simpleStyles.label}>Спорт:</Text>
+          <Text style={simpleStyles.value}>{getSportName(sportType)}</Text>
+        </View>
+        <View style={simpleStyles.infoRow}>
+          <Text style={simpleStyles.label}>Цвет:</Text>
+          <Text style={simpleStyles.value}>{getColorName(colorType)}</Text>
+        </View>
+        <View style={simpleStyles.infoRow}>
+          <Text style={simpleStyles.label}>Общая дистанция:</Text>
+          <Text style={simpleStyles.value}>{workoutData.totalDistance}м</Text>
+        </View>
+        <View style={simpleStyles.infoRow}>
+          <Text style={simpleStyles.label}>Общая продолжительность:</Text>
+          <Text style={simpleStyles.value}>
+            {secondsToTimeString(totalDuration)}
           </Text>
+        </View>
+        <View style={simpleStyles.infoRow}>
+          <Text style={simpleStyles.label}>Темп ПАНО:</Text>
+          <Text style={simpleStyles.value}>
+            {selectedTimeSeconds !== null
+              ? secondsToTimeString(selectedTimeSeconds)
+              : "не выбрано"}
+          </Text>
+        </View>
+        {sportType === "bike" && !isNaN(workoutData.watt) && (
+          <View style={simpleStyles.infoRow}>
+            <Text style={simpleStyles.label}>Мощность ПАНО:</Text>
+            <Text style={simpleStyles.value}>
+              {Math.round(workoutData.watt)}W
+            </Text>
+          </View>
         )}
       </View>
 
-      <Text style={styles.workoutSectionTitle}>РАЗМИНКА</Text>
-
-      <View style={styles.workoutRow}>
-        <View style={[styles.stick, styles.grayStick]} />
-        <View style={styles.iconsColumn}>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/time_b.png')} 
-              style={styles.smallIcon}
-            />
+      {/* Разминка */}
+      <View style={simpleStyles.section}>
+        <Text style={simpleStyles.sectionTitle}>РАЗМИНКА</Text>
+        <View style={simpleStyles.exerciseBlock}>
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Время:</Text>
+            <Text style={simpleStyles.exerciseValue}>10:00</Text>
           </View>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/tempo_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-          {sportType === 'bike' && (
-            <View style={styles.iconContainer}>
-              <Image 
-                source={require('../../assets/images/watt_b.png')} 
-                style={styles.smallIcon}
-              />
-            </View>
-          )}
-        </View>
-        <View style={styles.valuesColumn}>
-          <Text style={styles.valueText}>10:00</Text>
-          <Text style={styles.valueText}>
-            {secondsToTimeString(workoutData.relaxTemp)}
-          </Text>
-          {sportType === 'bike' && renderSingleWatt(workoutData.relaxWatt)}
-        </View>
-      </View>
-
-      
-      <Text style={styles.workoutSectionTitle}>ОСНОВНОЕ ЗАДАНИЕ</Text>
-      
-      {/* Подходы */}
-      <View style={styles.tagRow}>
-        <View style={[styles.stick, styles.whiteStick]} />
-        <View style={styles.singleIconContainer}>
-          <Image 
-            source={require('../../assets/images/approaches_b.png')} 
-            style={styles.mediumIcon}
-          />
-        </View>
-        <View style={styles.singleValueContainer}>
-          <Text style={styles.valueText}>{workoutData.sets} подходов</Text>
-        </View>
-      </View>
-
-      {/* Повторения */}
-      <View style={styles.tagRow}>
-        <View style={[styles.stick, styles.whiteStick]} />
-        <View style={styles.singleIconContainer}>
-          <Image 
-            source={require('../../assets/images/repeats_b.png')} 
-            style={styles.mediumIcon}
-          />
-        </View>
-        <View style={styles.singleValueContainer}>
-          <Text style={styles.valueText}>{workoutData.reps} повторений</Text>
-        </View>
-      </View>
-
-      {/* Основное упражнение */}
-      <View style={styles.workoutRow}>
-        <View style={[styles.stick, styles.goldenStick]} />
-        <View style={styles.iconsColumn}>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/tempo_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-          {sportType === 'bike' && (
-            <View style={styles.iconContainer}>
-              <Image 
-                source={require('../../assets/images/watt_b.png')} 
-                style={styles.smallIcon}
-              />
-            </View>
-          )}
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/distance.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-        </View>
-        <View style={styles.valuesColumn}>
-          <Text style={styles.valueText}>
-            {secondsToTimeString(workoutData.minTemp)} - {secondsToTimeString(workoutData.maxTemp)}
-          </Text>
-          {sportType === 'bike' && renderWattInfo(workoutData.minWatt, workoutData.maxWatt)}
-          <Text style={styles.valueText}>{workoutData.distance}m</Text>
-        </View>
-      </View>
-
-      {/* Отдых */}
-      <View style={styles.workoutRow}>
-        <View style={[styles.stick, styles.beigeStick]} />
-        <View style={styles.iconsColumn}>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/tempo_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-          {sportType === 'bike' && (
-            <View style={styles.iconContainer}>
-              <Image 
-                source={require('../../assets/images/watt_b.png')} 
-                style={styles.smallIcon}
-              />
-            </View>
-          )}
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/distance.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-        </View>
-        <View style={styles.valuesColumn}>
-          <Text style={styles.valueText}>{secondsToTimeString(workoutData.relaxTemp)}</Text>
-          {sportType === 'bike' && renderSingleWatt(workoutData.relaxWatt)}
-          <Text style={styles.valueText}>{workoutData.relaxDistance}m</Text>
-        </View>
-      </View>
-
-      {/* Отдых между подходами */}
-      <View style={styles.tagRow}>
-        <View style={[styles.stick, styles.lightGrayStick]} />
-        <View style={styles.singleValueContainer}>
-          <Text style={styles.valueText}>Отдых между подходами 3 минуты</Text>
-        </View>
-      </View>
-
-      <Text style={styles.workoutSectionTitle}>ЗАМИНКА</Text>
-      
-      {/* Заминка */}
-      <View style={styles.workoutRow}>
-        <View style={[styles.stick, styles.grayStick]} />
-        <View style={styles.iconsColumn}>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/time_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View> 
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../assets/images/tempo_b.png')} 
-              style={styles.smallIcon}
-            />
-          </View>
-          {sportType === 'bike' && (
-            <View style={styles.iconContainer}>
-              <Image 
-                source={require('../../assets/images/watt_b.png')} 
-                style={styles.smallIcon}
-              />
-            </View>
-          )}
-        </View>
-        <View style={styles.valuesColumn}>
-          <Text style={styles.valueText}>10:00</Text>
-          <View style={styles.calcContainer}>
-            <Text style={styles.valueText}>
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
+            <Text style={simpleStyles.exerciseValue}>
               {secondsToTimeString(workoutData.relaxTemp)}
             </Text>
           </View>
-          {sportType === 'bike' && renderSingleWatt(workoutData.relaxWatt)}
+          {sportType === "bike" && !isNaN(workoutData.relaxWatt) && (
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
+              <Text style={simpleStyles.exerciseValue}>
+                {Math.round(workoutData.relaxWatt)}W
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
-      {/* Блок с данными из бэкенда (ПЕРЕНЕСЕН В КОНЕЦ) */}
-      <View style={extendedStyles.backendDataContainer}>
-        <Text style={styles.workoutSectionTitle}>ДАННЫЕ ИЗ БАЗЫ ДАННЫХ</Text>
-        
-        {/* Кнопка для вызова GigaChat */}
-        <TouchableOpacity 
-          style={extendedStyles.gigaButton}
+      {/* Основное задание */}
+      <View style={simpleStyles.section}>
+        <Text style={simpleStyles.sectionTitle}>ОСНОВНОЕ ЗАДАНИЕ</Text>
+
+        <View style={simpleStyles.exerciseBlock}>
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Подходы:</Text>
+            <Text style={simpleStyles.exerciseValue}>{workoutData.sets}</Text>
+          </View>
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Повторения:</Text>
+            <Text style={simpleStyles.exerciseValue}>{workoutData.reps}</Text>
+          </View>
+
+          <View style={simpleStyles.divider} />
+
+          <Text style={simpleStyles.subtitle}>Основное упражнение:</Text>
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
+            <Text style={simpleStyles.exerciseValue}>
+              {secondsToTimeString(workoutData.minTemp)} -{" "}
+              {secondsToTimeString(workoutData.maxTemp)}
+            </Text>
+          </View>
+          {sportType === "bike" &&
+            !isNaN(workoutData.minWatt) &&
+            !isNaN(workoutData.maxWatt) && (
+              <View style={simpleStyles.exerciseRow}>
+                <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
+                <Text style={simpleStyles.exerciseValue}>
+                  {Math.round(workoutData.minWatt)} -{" "}
+                  {Math.round(workoutData.maxWatt)}W
+                </Text>
+              </View>
+            )}
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Дистанция:</Text>
+            <Text style={simpleStyles.exerciseValue}>
+              {workoutData.distance}м
+            </Text>
+          </View>
+
+          <View style={simpleStyles.divider} />
+
+          <Text style={simpleStyles.subtitle}>Отдых:</Text>
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Время:</Text>
+            <Text style={simpleStyles.exerciseValue}>
+              {secondsToTimeString(workoutData.relaxTemp)}
+            </Text>
+          </View>
+          {sportType === "bike" && !isNaN(workoutData.relaxWatt) && (
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
+              <Text style={simpleStyles.exerciseValue}>
+                {Math.round(workoutData.relaxWatt)}W
+              </Text>
+            </View>
+          )}
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Дистанция:</Text>
+            <Text style={simpleStyles.exerciseValue}>
+              {workoutData.relaxDistance}м
+            </Text>
+          </View>
+
+          <View style={simpleStyles.divider} />
+
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>
+              Отдых между подходами:
+            </Text>
+            <Text style={simpleStyles.exerciseValue}>3 минуты</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Заминка */}
+      <View style={simpleStyles.section}>
+        <Text style={simpleStyles.sectionTitle}>ЗАМИНКА</Text>
+        <View style={simpleStyles.exerciseBlock}>
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Время:</Text>
+            <Text style={simpleStyles.exerciseValue}>10:00</Text>
+          </View>
+          <View style={simpleStyles.exerciseRow}>
+            <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
+            <Text style={simpleStyles.exerciseValue}>
+              {secondsToTimeString(workoutData.relaxTemp)}
+            </Text>
+          </View>
+          {sportType === "bike" && !isNaN(workoutData.relaxWatt) && (
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
+              <Text style={simpleStyles.exerciseValue}>
+                {Math.round(workoutData.relaxWatt)}W
+              </Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      {/* Данные из базы данных */}
+      <View style={simpleStyles.section}>
+        <Text style={simpleStyles.sectionTitle}>ДАННЫЕ ИЗ БАЗЫ ДАННЫХ</Text>
+
+        <TouchableOpacity
+          style={simpleStyles.button}
           onPress={callGigaChat}
           disabled={loadingGiga}
         >
-          <Text style={extendedStyles.gigaButtonText}>
-            {loadingGiga ? 'Загрузка...' : 'Спросить у GigaChat'}
+          <Text style={simpleStyles.buttonText}>
+            {loadingGiga ? "Загрузка..." : "Спросить у GigaChat"}
           </Text>
         </TouchableOpacity>
-        
+
         {loading ? (
-          <Text style={extendedStyles.backendText}>Загрузка данных...</Text>
-        ) : error ? (
-          <Text style={extendedStyles.backendError}>Ошибка: {error}</Text>
+          <Text style={simpleStyles.text}>Загрузка данных...</Text>
         ) : backendData ? (
-          <View style={extendedStyles.backendInfoContainer}>
-            <Text style={extendedStyles.backendText}>ID: {backendData.id}</Text>
-            <Text style={extendedStyles.backendText}>Name: {backendData.name}</Text>
-            <Text style={extendedStyles.backendText}>Age: {backendData.age}</Text>
-            
-            {/* Блок ответа GigaChat */}
-            <View style={extendedStyles.gigaResponseContainer}>
-              <Text style={styles.workoutSectionTitle}>ОТВЕТ GIGACHAT:</Text>
-              {loadingGiga ? (
-                <Text style={extendedStyles.backendText}>Запрашиваю ответ...</Text>
-              ) : errorGiga ? (
-                <Text style={extendedStyles.backendError}>Ошибка: {errorGiga}</Text>
-              ) : gigaResponse ? (
-                <Text style={extendedStyles.gigaResponseText}>{gigaResponse}</Text>
-              ) : (
-                <Text style={extendedStyles.backendText}>Нажмите кнопку выше</Text>
-              )}
+          <View style={simpleStyles.exerciseBlock}>
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>ID:</Text>
+              <Text style={simpleStyles.exerciseValue}>{backendData.id}</Text>
+            </View>
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>Имя:</Text>
+              <Text style={simpleStyles.exerciseValue}>{backendData.name}</Text>
+            </View>
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>Возраст:</Text>
+              <Text style={simpleStyles.exerciseValue}>{backendData.age}</Text>
             </View>
           </View>
         ) : (
-          <Text style={extendedStyles.backendText}>Данные не получены</Text>
+          <Text style={simpleStyles.text}>Данные не получены</Text>
         )}
+
+        {/* Ответ GigaChat */}
+        {gigaResponse ? (
+          <View style={simpleStyles.exerciseBlock}>
+            <Text style={simpleStyles.sectionTitle}>ОТВЕТ GIGACHAT:</Text>
+            <Text style={simpleStyles.gigaText}>{gigaResponse}</Text>
+          </View>
+        ) : null}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
-// Добавляем стили для бэкенд данных (серо-белая палитра, оранжевая кнопка)
-const extendedStyles = {
-  ...styles,
-  backendDataContainer: {
-    marginBottom: 20,
-    padding: 15,
-    backgroundColor: '#f8f9fa', // Светло-серый фон
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#dee2e6', // Серый бордер
+// Упрощенные стили
+const simpleStyles = {
+  container: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  backendInfoContainer: {
-    marginTop: 10,
-  },
-  backendText: {
-    fontSize: 14,
-    color: '#495057', // Темно-серый текст
-    marginBottom: 5,
-  },
-  backendError: {
-    fontSize: 14,
-    color: '#dc3545', // Красный для ошибок
-    marginBottom: 5,
-  },
-  gigaButton: {
-    backgroundColor: '#fd7e14', // Оранжевый цвет как в теме
-    padding: 12,
+  section: {
+    backgroundColor: "white",
     borderRadius: 8,
-    marginVertical: 10,
-    alignItems: 'center',
-    elevation: 2, // Тень для Android
-    shadowColor: '#000', // Тень для iOS
-    shadowOffset: { width: 0, height: 2 },
+    padding: 16,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowRadius: 2,
   },
-  gigaButtonText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 16,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 12,
   },
-  gigaResponseContainer: {
-    marginTop: 15,
-    padding: 12,
-    backgroundColor: '#ffffff', // Белый фон
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ced4da', // Светло-серый бордер
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
-  gigaResponseText: {
+  label: {
     fontSize: 14,
-    color: '#212529', // Очень темно-серый почти черный
-    fontStyle: 'italic',
-    marginTop: 5,
+    color: "#666",
+    flex: 1,
+  },
+  value: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "500",
+    flex: 1,
+    textAlign: "right",
+  },
+  exerciseBlock: {
+    marginTop: 8,
+  },
+  exerciseRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 6,
+  },
+  exerciseLabel: {
+    fontSize: 14,
+    color: "#666",
+    flex: 1,
+  },
+  exerciseValue: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "500",
+    flex: 1,
+    textAlign: "right",
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginVertical: 12,
+  },
+  button: {
+    backgroundColor: "#ff6b35",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: "center",
+    marginVertical: 12,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  text: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    paddingVertical: 12,
+  },
+  gigaText: {
+    fontSize: 14,
+    color: "#333",
+    fontStyle: "italic",
     lineHeight: 20,
+    marginTop: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+    marginBottom: 12,
   },
 };
 

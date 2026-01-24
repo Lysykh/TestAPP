@@ -1,50 +1,3 @@
-
-// Тренировка выносливости (В)
-
-// В1. Восстановление. Плавайте 10–20 минут или более в пульсовой зоне 1 (см. табл.
-// 4.1), концентрируясь на технике. Используйте это упражнение после пробивного упражне-
-// ния на велосипеде или бега для ускорения восстановления либо в качестве заминки после
-// тренировки по плаванию. (Периоды: все.)
-
-// В2. Экстенсивные интервалы выносливости. Плавайте интервалами по 6–12 минут
-// в зонах 2 и 3. Период восстановления после каждого интервала должен составлять 10–15 %
-// времени от рабочего интервала. Общая длина рабочих интервалов может соответствовать
-// длине дистанции по плаванию очередной грядущей гонки типа A или B. Варианты этого
-// упражнения могут использоваться для восстановления вкупе с упражнениями по отработке
-// навыков на дистанции 25–50 метров. Пример: 4 I 500 метров (проплывая 500 метров за 7:30
-// при режиме 8:1524). Вариант упражнения – длинные заплывы в постоянном темпе в зоне 2,
-// особенно в открытой воде. (Периоды: все.)
-
-// В3. Интенсивные интервалы выносливости. Плавайте интервалами, для заверше-
-// ния каждого из которых требуется 3–5 минут. Интенсивность – в рамках зоны 3. Период
-// восстановления должен составлять 5–10 % от времени предыдущего рабочего интервала.
-// Общее время рабочих интервалов может соответствовать примерному времени, необходи-
-// мому для прохождения дистанции по плаванию ближайшей гонки типа A или B. Пример: 5 I
-// 400 метров (проплывая 400 метров за 6:00 при режиме 6:20). (Периоды: Подготовительный,
-// Базовый 1, Базовый 2, Базовый 3.)
-
-
-// описание калькулятора регулярный бег
-// 1. Ограничения дистанции от 800 до 2400 
-// 2. минимальная дистанция 3000 метров
-// 3. масимальная дистанция 10000 метров 
-// 4. отдых от 200 до 400 метров 
-// 5. максимальное количество повторов - до упора по ограничению в дистанцию
-// 6. максимальное количество подходов 1
-// 7. зона работы Аэробная (105% к темпу) 
-// 8. количество повторений не больше 10
-// 9. количество подходов не более 5
-
-		
-// ТЕМПОВЫЕ ЗОНЫ	НОРМА	минимум	максимум
-// 1	135%	трусца	08:16
-// ОТДЫХ 2	129%	08:16	07:54
-// ЛЕГКАЯ 3	113%	07:54	06:55
-// АЭРОБНАЯ 4	105%	06:55	06:26
-// ПАНО 5	100%	06:26	06:08
-// МПК 6	96%	06:08	05:53
-// АНАЭРОБ 7	90%	05:53	
-
 export type RunLong = {
   id: number;
   distance: number;
@@ -81,14 +34,31 @@ export default function createTrainingArray_swim(
 
   const count = 40;
 
+  //ЗАДАЕМ ОСНОВНЫЕ УСЛОВИЯ ТРЕНИРОВКИ
+  let terms_worktimemin = 360
+  let terms_worktimemax = 720
+  let terms_coefficient = 0.15
+  // вычисляем начальную дистанцию рабочего отрезка 
+  let terms_workdistance_min = Math.floor(terms_worktimemin / temp ) * 100 
+  let terms_workdistance_max = Math.ceil(terms_worktimemax / temp ) * 100 
+  // задаем предельные значения РАБОТЫ внутри тренировки из соображений 10 минут разминка \ 10 минут замика - дополнительно к работе/ 
+  let terms_totaltime_min = 1800
+  let terms_totaltime_max = 3000
+  // задаем шаг внутри рабочего отрезка
+  let terms_distance_plus = Math.round((terms_totaltime_max - terms_totaltime_min) / 10 / temp / 100) * 100;
+  let totalTime = 0
+
   // Сначала собираем все тренировки
   // Задаем количество ПОДХОДОВ (до большой паузы)
   for (let sets = 1; sets <= 3; sets++) {
-    
+     if (totalTime > terms_totaltime_max) {
+          break;
+        }
     
       // Задаем количество ПОВТОРОВ (количество работ внутри подхода)
-    for (let reps = 1; reps <= 6; reps++) {
-      
+    for (let reps = 1; reps <= 3; reps++) {
+    
+
       
     //  newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
 
@@ -102,29 +72,24 @@ export default function createTrainingArray_swim(
   // минимальная врея/дистация 50 минут - 10 мин на разминку 10 мин на заминку - 30 минут (1800 секунд) на работут - 
   // максимальное время/дистанция 70 минут - 10 мин на разминку 10 мин на заминку - 50 минут (3000 секунд) на работут -   
   // Для ЗЕЛЕНЫХ В2 тренировок время отдыха должно быть 10-15% от работы
-
    // Задаем СТАРТОВУЮ дистанцию работы внутри ПОВТОРА. 
    
+
+
       let distance: number;
-  if (temp === 160) {
-    distance = 200;
-  } else if (temp === 140) {
-    distance = 400;
-  } else {
-    // Значение по умолчанию или для других случаев
-    distance = 600;
-  }  
-
-
+      distance = terms_workdistance_min
+ 
       for (let i = 0; i < count; i++) {
         // ограничиваем дистанцию РАБОЧЕГО ПОДХОДА
-        if (distance > 500) {
+        if (distance > terms_workdistance_max) {
           break;
         }
+    
         
         // Округляем relaxDistance до ближайших 100
-        const relaxDistance = Math.ceil(distance * 0.2 / 100) * 100;
-        
+        const relaxDistance = Math.ceil(distance * terms_coefficient / 100) * 100;
+        totalTime = (distance + relaxDistance) * reps * sets / 100 * temp
+
         trainingArray.push({
           id: idCounter++,
           distance: distance,
@@ -136,11 +101,12 @@ export default function createTrainingArray_swim(
           relaxTemp: temp * 1.25,
           relaxDistance: relaxDistance,
           totalDistance: (distance + relaxDistance) * reps * sets,
-          totalTime: (distance + relaxDistance) * reps * sets
+          totalTime: (distance + relaxDistance) * reps * sets / 100 * temp
         });
         
         // задаем ШАГ плюса к ДИСТАНЦИИ РАБОТЫ
-        distance += 50;
+        distance += terms_distance_plus;
+        
       }
     }
   }
@@ -148,7 +114,7 @@ export default function createTrainingArray_swim(
   // Сортируем массив по totalDistance в порядке возрастания
   trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
 
-// Дополнительная сортировка для одинаковой дистанции
+  // Дополнительная сортировка для одинаковой дистанции
   trainingArray.sort((a, b) => {
     if (a.totalDistance === b.totalDistance) {
       // Сначала сравниваем по sets (большие значения вперед)
@@ -186,7 +152,19 @@ export default function createTrainingArray_swim(
     console.log("---------------------------------");
   });
 
+  // Вывод количества тренировок и всех переменных terms_
   console.log(`Всего сгенерировано тренировок: ${trainingArray.length}`);
+  console.log("\nПараметры генерации (terms_ переменные):");
+  console.log("==========================================");
+  console.log(`terms_worktimemin: ${terms_worktimemin} сек (${formatTime(terms_worktimemin/60)} мин)`);
+  console.log(`terms_worktimemax: ${terms_worktimemax} сек (${formatTime(terms_worktimemax/60)} мин)`);
+  console.log(`terms_coefficient: ${terms_coefficient} (${terms_coefficient * 100}%)`);
+  console.log(`terms_workdistance_min: ${terms_workdistance_min}м`);
+  console.log(`terms_workdistance_max: ${terms_workdistance_max}м`);
+  console.log(`terms_totaltime_min: ${terms_totaltime_min} сек (${formatTime(terms_totaltime_min/60)} мин)`);
+  console.log(`terms_totaltime_max: ${terms_totaltime_max} сек (${formatTime(terms_totaltime_max/60)} мин)`);
+  console.log(`terms_distance_plus: ${terms_distance_plus}м`);
+  console.log(`Входной параметр temp: ${formatTime(temp)} мин/км`);
 
   return trainingArray;
 }

@@ -1,25 +1,24 @@
-// ОРАНЬЖЕВАЯ ЕЩЕ НЕ ИСПРАВЛЯЛ
+// Описание тенировки
+// Автор: Джо Фрилл
+// Зона:  3
+// Название: В3. Экстенсивные интервалы выносливости. 
+// Особенность: РЕДАКЦИЯ СОБСТВЕННАЯ "ФАРТЛЕК" В ОРИГИНАЛЕ ОТДЫХ от 5 до 10 % от интервала. Из за перевода в фартлек удлинен восстановительный интервал
+// Длина рабочего повторения: от 6 до 12 минут (это от 300 - 500)
+// Восстановление: 50 метров
+// Темповая зона: 3 - 113% от ПАНО - в плавании множтель не примняется 
+// Количество рабочих повторений внутри подхода : от 2 до 3 
+// Период использования: Подготовительный, базовый 1 - 3 
+// В2. Экстенсивные интервалы выносливости.
 
-// описание калькулятора регулярный бег
-// 1. Ограничения дистанции от 800 до 2400 
-// 2. минимальная дистанция 3000 метров
-// 3. масимальная дистанция 10000 метров 
-// 4. отдых от 200 до 400 метров 
-// 5. максимальное количество повторов - до упора по ограничению в дистанцию
-// 6. максимальное количество подходов 1
-// 7. зона работы Аэробная (105% к темпу) 
-// 8. количество повторений не больше 10
-// 9. количество подходов не более 5
-
-		
-// ТЕМПОВЫЕ ЗОНЫ	НОРМА	минимум	максимум
-// 1	135%	трусца	08:16
-// ОТДЫХ 2	129%	08:16	07:54
-// ЛЕГКАЯ 3	113%	07:54	06:55
-// АЭРОБНАЯ 4	105%	06:55	06:26
-// ПАНО 5	100%	06:26	06:08
-// МПК 6	96%	06:08	05:53
-// АНАЭРОБ 7	90%	05:53	
+// ТЕМПОВЫЕ ЗОНЫ	НОРМА	значение	
+// 		минимальный темп	максимальный темп
+// 1	129%	02:53	02:34
+// 2	121%	02:34	02:24
+// 3	113%	02:24	02:14
+// 4	106%	02:14	02:06
+// 5	100%	02:06	01:59
+// 6	96%	01:59	01:54
+// 7	89%	01:54	01:46
 
 export type RunLong = {
   id: number;
@@ -32,7 +31,7 @@ export type RunLong = {
   relaxTemp: number | null;
   relaxDistance: number | null;
   totalDistance: number;
-  totalTime:number;
+  totalTime: number;
 };
 
 // Функция для преобразования числа в формат мм:сс
@@ -52,78 +51,139 @@ function formatTime(minutes: number | null): string {
 export default function createTrainingArray_orange_swim(
   temp: number,
 ): RunLong[] {
-  const trainingArray: RunLong[] = [];
-  let idCounter = 1;
-
-  const count = 40;
-
-  // Сначала собираем все тренировки
-  for (let sets = 1; sets <= 5; sets++) {
-    for (let reps = 2; reps <= 14; reps++) {
-      
-      
-          //  newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
-
-  
-      let distance: number;
-  if (temp === 160) {
-    distance = 100;
-  } else if (temp === 140) {
-    distance = 200;
-  } else {
-    // Значение по умолчанию или для других случаев
-    distance = 200;
-  }  
-
-      
-      
-      for (let i = 0; i < count; i++) {
-        if (distance > 400) {
-          break;
-        }
-        
-        trainingArray.push({
-          id: idCounter++,
-          distance: distance,
-          temp: temp,
-          reps: reps,
-          sets: sets,
-          minTemp: temp,
-          maxTemp: temp * 1.05,
-          relaxTemp: temp * 1.25,
-          relaxDistance: distance * 0.5,
-          totalDistance: (distance + (distance * 0.5)) * reps * sets,
-          totalTime: (distance + (distance * 0.5)) * reps * sets 
-           
-        });
-        
-        distance += 50;
-      }
+  // Создаем массив из 10 одинаковых тренировок вручную
+  const trainingArray: RunLong[] = [
+    {
+      id: 1,
+      distance: 300,
+      temp: temp,
+      reps: 1,
+      sets: 2,
+      minTemp: temp * 1.06,
+      maxTemp: temp * 1.13,
+      relaxTemp: temp * 1.29,
+      relaxDistance: 50,
+      totalDistance: 700,
+      totalTime: 665
+    },
+    {
+      id: 2,
+      distance: 450,
+      temp: temp,
+      reps: 1,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 550,
+      totalTime: 180
+    },
+    {
+      id: 3,
+      distance: 600,
+      temp: temp,
+      reps: 1,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 700,
+      totalTime: 180
+    },
+    {
+      id: 4,
+      distance: 400,
+      temp: temp,
+      reps: 2,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 1000,
+      totalTime: 180
+    },
+    {
+      id: 5,
+      distance: 500,
+      temp: temp,
+      reps: 2,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 1200,
+      totalTime: 180
+    },
+    {
+      id: 6,
+      distance: 600,
+      temp: temp,
+      reps: 2,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 1400,
+      totalTime: 180
+    },
+    {
+      id: 7,
+      distance: 450,
+      temp: temp,
+      reps: 3,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 1650,
+      totalTime: 180
+    },
+    {
+      id: 8,
+      distance: 300,
+      temp: temp,
+      reps: 5,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 2000,
+      totalTime: 180
+    },
+    {
+      id: 9,
+      distance: 350,
+      temp: temp,
+      reps: 5,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 2250,
+      totalTime: 180
+    },
+    {
+      id: 10,
+      distance: 300,
+      temp: temp,
+      reps: 6,
+      sets: 1,
+      minTemp: temp,
+      maxTemp: temp * 1.05,
+      relaxTemp: temp * 1.25,
+      relaxDistance: 100,
+      totalDistance: 2400,
+      totalTime: 180
     }
-  }
-
-  // Сортируем массив по totalDistance в порядке возрастания
-  trainingArray.sort((a, b) => a.totalDistance - b.totalDistance);
-
-// Дополнительная сортировка для одинаковой дистанции
-  trainingArray.sort((a, b) => {
-    if (a.totalDistance === b.totalDistance) {
-      // Сначала сравниваем по sets (большие значения вперед)
-      if (b.sets !== a.sets) {
-        return b.sets - a.sets;
-      }
-      // Затем сравниваем по reps (большие значения вперед)
-      if (b.reps !== a.reps) {
-        return b.reps - a.reps;
-      }
-    }
-    return a.totalDistance - b.totalDistance;
-  });
-
-  // Перезаписываем id в соответствии с новой сортировкой
-  trainingArray.forEach((training, index) => {
-    training.id = index + 1;
-  });
+  ];
 
   // Вывод всех сгенерированных тренировок на консоль
   console.log("Все сгенерированные тренировки (ОРАНЖЕВАЯ):");
