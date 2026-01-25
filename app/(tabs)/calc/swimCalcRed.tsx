@@ -1,4 +1,23 @@
+// Описание тенировки
+// Автор: Джо Фрилл
+// Зона:  6
+// МПК
+// Особенность:
+// Длина рабочего повторения: от 2 до 3 минут (это от 50 - 150)
+// Восстановление: 50 метров
+// Темповая зона: 3 - 113% от ПАНО - в плавании множтель не примняется
+// Количество рабочих повторений внутри подхода : от 3 до 7
+// Период использования: Подготовительный, базовый 1 - 3
 
+// ТЕМПОВЫЕ ЗОНЫ	НОРМА	значение
+// 		минимальный темп	максимальный темп
+// 1	129%	02:53	02:34
+// 2	121%	02:34	02:24
+// 3	113%	02:24	02:14
+// 4	106%	02:14	02:06
+// 5	100%	02:06	01:59
+// 6	96%	01:59	01:54
+// 7	89%	01:54	01:46
 
 export type RunLong = {
   id: number;
@@ -16,159 +35,235 @@ export type RunLong = {
 
 // Функция для преобразования числа в формат мм:сс
 function formatTime(minutes: number | null): string {
-  if (minutes === null) return '--:--';
-  
+  if (minutes === null) return "--:--";
+
   const wholeMinutes = Math.floor(minutes);
   const seconds = Math.round((minutes - wholeMinutes) * 60);
-  
+
   // Форматируем секунды, чтобы всегда было 2 цифры
-  const formattedSeconds = seconds.toString().padStart(2, '0');
-  
+  const formattedSeconds = seconds.toString().padStart(2, "0");
+
   return `${wholeMinutes}:${formattedSeconds}`;
 }
 
 // Функция для создания массива тренировок с фиксированными значениями
-export default function createTrainingArray_red_swim(
-  temp: number,
-): RunLong[] {
+export default function createTrainingArray_red_swim(temp: number): RunLong[] {
   // Создаем массив из 10 одинаковых тренировок вручную
   const trainingArray: RunLong[] = [
     {
       id: 1,
-      distance: 3000,
+      distance: 100,
       temp: temp,
-      reps: 1,
-      sets: 1,
+      reps: 2,
+      sets: 2,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
-      totalDistance: 400,
-      totalTime: 180
+      totalDistance: 800,
+      totalTime: 180,
     },
     {
       id: 2,
-      distance: 450,
+      distance: 50,
       temp: temp,
-      reps: 1,
-      sets: 1,
+      reps: 2,
+      sets: 3,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
-      totalDistance: 550,
-      totalTime: 180
+      totalDistance: 900,
+      totalTime: 180,
     },
     {
       id: 3,
-      distance: 600,
+      distance: 100,
       temp: temp,
       reps: 1,
-      sets: 1,
+      sets: 5,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
-      totalDistance: 700,
-      totalTime: 180
+      totalDistance: 1000,
+      totalTime: 180,
     },
     {
       id: 4,
-      distance: 400,
+      distance: 100,
       temp: temp,
-      reps: 2,
-      sets: 1,
+      reps: 1,
+      sets: 6,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
-      totalDistance: 1000,
-      totalTime: 180
+      totalDistance: 1200,
+      totalTime: 180,
     },
     {
       id: 5,
-      distance: 500,
+      distance: 100,
       temp: temp,
       reps: 2,
-      sets: 1,
+      sets: 3,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
       totalDistance: 1200,
-      totalTime: 180
+      totalTime: 180,
     },
     {
       id: 6,
-      distance: 600,
+      distance: 150,
       temp: temp,
-      reps: 2,
-      sets: 1,
+      reps: 1,
+      sets: 5,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
-      totalDistance: 1400,
-      totalTime: 180
+      totalDistance: 1250,
+      totalTime: 180,
     },
     {
       id: 7,
-      distance: 450,
+      distance: 150,
       temp: temp,
-      reps: 3,
-      sets: 1,
+      reps: 1,
+      sets: 6,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
-      totalDistance: 1650,
-      totalTime: 180
+      totalDistance: 1500,
+      totalTime: 180,
     },
     {
       id: 8,
-      distance: 300,
+      distance: 150,
       temp: temp,
       reps: 5,
       sets: 1,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
-      totalDistance: 2000,
-      totalTime: 180
+      totalDistance: 1500,
+      totalTime: 180,
     },
     {
       id: 9,
-      distance: 350,
+      distance: 100,
       temp: temp,
-      reps: 5,
-      sets: 1,
+      reps: 2,
+      sets: 4,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
-      totalDistance: 2250,
-      totalTime: 180
+      totalDistance: 1600,
+      totalTime: 180,
     },
     {
       id: 10,
-      distance: 300,
+      distance: 50,
       temp: temp,
-      reps: 6,
-      sets: 1,
+      reps: 3,
+      sets: 4,
       minTemp: temp,
-      maxTemp: temp * 1.05,
-      relaxTemp: temp * 1.25,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
+      relaxDistance: 100,
+      totalDistance: 1800,
+      totalTime: 180,
+    },
+    {
+      id: 11,
+      distance: 100,
+      temp: temp,
+      reps: 2,
+      sets: 5,
+      minTemp: temp,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
+      relaxDistance: 100,
+      totalDistance: 2000,
+      totalTime: 180,
+    },
+    {
+      id: 12,
+      distance: 50,
+      temp: temp,
+      reps: 3,
+      sets: 5,
+      minTemp: temp,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
+      relaxDistance: 100,
+      totalDistance: 2250,
+      totalTime: 180,
+    },
+    {
+      id: 13,
+      distance: 100,
+      temp: temp,
+      reps: 2,
+      sets: 6,
+      minTemp: temp,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
       relaxDistance: 100,
       totalDistance: 2400,
-      totalTime: 180
-    }
+      totalTime: 180,
+    },
+    {
+      id: 14,
+      distance: 150,
+      temp: temp,
+      reps: 2,
+      sets: 5,
+      minTemp: temp,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
+      relaxDistance: 100,
+      totalDistance: 2500,
+      totalTime: 180,
+    },
+    {
+      id: 15,
+      distance: 150,
+      temp: temp,
+      reps: 2,
+      sets: 6,
+      minTemp: temp,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
+      relaxDistance: 100,
+      totalDistance: 3000,
+      totalTime: 180,
+    },
+    {
+      id: 16,
+      distance: 150,
+      temp: temp,
+      reps: 3,
+      sets: 4,
+      minTemp: temp,
+      maxTemp: temp * 0.96,
+      relaxTemp: temp * 1.29,
+      relaxDistance: 100,
+      totalDistance: 3000,
+      totalTime: 180,
+    },
   ];
 
   // Вывод всех сгенерированных тренировок на консоль
   console.log("Все сгенерированные тренировки (ОРАНЖЕВАЯ):");
   console.log("=================================");
-  trainingArray.forEach(training => {
+  trainingArray.forEach((training) => {
     console.log(`ID: ${training.id}`);
     console.log(`  Дистанция: ${training.distance}м`);
     console.log(`  Темп: ${formatTime(training.temp)} мин/км`);
