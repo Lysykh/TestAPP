@@ -48,6 +48,8 @@ interface BackendItem {
 }
 
 // Конфигурация временных порогов для разных видов спорта
+// временные пороги это те пороги после которых тренировка стартует с уровня + 3 и +6 по сравнению с базовым .
+// Пользователь реальный вроень тренировки не видит и всегда видит как первый
 const SPORT_TIME_THRESHOLDS = {
   swim: {
     high: 149,
@@ -67,6 +69,7 @@ const WorckOutMain = ({
   workoutLevel,
   sportType,
   colorType,
+  // selectedTimeSeconds - это переменная которая обозначает какой мы выбрали ПАНО Для того чтобы посчитать среднее время тренировки нужно брать не ПАНО
   selectedTimeSeconds,
 }: WorckOutMainProps) => {
   const [backendData, setBackendData] = useState<BackendItem | null>(null);
@@ -221,6 +224,7 @@ const WorckOutMain = ({
   }
 
   const razryad = getSportName(sportType) === "плавание" ? 100 : 1000;
+  // по этой формуле среднее время расчитывается как общая дистанция которую мы преодалеем в темпе ПАНО,
   const totalDuration = selectedTimeSeconds
     ? (workoutData.totalDistance / razryad) * selectedTimeSeconds
     : 0;
@@ -399,7 +403,7 @@ const WorckOutMain = ({
 
       {/* Данные из базы данных */}
       <View style={simpleStyles.section}>
-        <Text style={simpleStyles.sectionTitle}>ДАННЫЕ ИЗ БАЗЫ ДАННЫХ</Text>
+        <Text style={simpleStyles.sectionTitle}>КОНСУЛЬТАЦИЯ AI</Text>
 
         <TouchableOpacity
           style={simpleStyles.button}
@@ -411,7 +415,7 @@ const WorckOutMain = ({
           </Text>
         </TouchableOpacity>
 
-        {loading ? (
+        {/* {loading ? (
           <Text style={simpleStyles.text}>Загрузка данных...</Text>
         ) : backendData ? (
           <View style={simpleStyles.exerciseBlock}>
@@ -430,12 +434,12 @@ const WorckOutMain = ({
           </View>
         ) : (
           <Text style={simpleStyles.text}>Данные не получены</Text>
-        )}
+        )} */}
 
         {/* Ответ GigaChat */}
         {gigaResponse ? (
           <View style={simpleStyles.exerciseBlock}>
-            <Text style={simpleStyles.sectionTitle}>ОТВЕТ GIGACHAT:</Text>
+            <Text style={simpleStyles.sectionTitle}>КОНСУЛЬТАЦИЯ AI:</Text>
             <Text style={simpleStyles.gigaText}>{gigaResponse}</Text>
           </View>
         ) : null}
