@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 interface SelectSportLevelProps {
   onTimeChange: (timeInSeconds: number | null) => void;
@@ -8,14 +8,14 @@ interface SelectSportLevelProps {
 
 // Функция для преобразования времени в секунды
 const timeStringToSeconds = (timeString: string): number => {
-  const [minutes, seconds] = timeString.split(':').map(Number);
+  const [minutes, seconds] = timeString.split(":").map(Number);
   return minutes * 60 + seconds;
 };
 
 const secondsToTimeString = (totalSeconds: number): string => {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = Math.floor(totalSeconds % 60);
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
 
 // Альтернативный вариант с фиксированными значениями ватт
@@ -27,18 +27,25 @@ const getWattsForTime = (timeInSeconds: number): number => {
     130: 190,
     120: 240,
     110: 300,
-    105: 400
+    105: 400,
   };
-  
+
   return wattsMap[timeInSeconds] || 0;
 };
 
-const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selectedSport }) => {
-  const [selectedTimeSeconds, setSelectedTimeSeconds] = useState<number | null>(null);
+const SelectSportLevel: React.FC<SelectSportLevelProps> = ({
+  onTimeChange,
+  selectedSport,
+}) => {
+  const [selectedTimeSeconds, setSelectedTimeSeconds] = useState<number | null>(
+    null,
+  );
   const [selectedBox, setSelectedBox] = useState<number | null>(null);
-  const [timeOptionsInSeconds, setTimeOptionsInSeconds] = useState<number[]>([]);
+  const [timeOptionsInSeconds, setTimeOptionsInSeconds] = useState<number[]>(
+    [],
+  );
   const [buttonDistance, setButtonDistance] = useState<number>(100);
-  const [distanceText, setDistanceText] = useState<string>('100м');
+  const [distanceText, setDistanceText] = useState<string>("100м");
   const [showWatts, setShowWatts] = useState<boolean>(false);
 
   // Обновляем параметры при изменении выбранного вида спорта
@@ -49,29 +56,31 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
     let newShowWatts: boolean;
 
     switch (selectedSport) {
-      case 'swim':
+      case "swim":
         newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
         newButtonDistance = 100;
-        newDistanceText = '100м';
+        newDistanceText = "100м";
         newShowWatts = false;
         break;
-      case 'run':
-        newTimeOptions = [480, 420, 390, 375, 360, 350, 345, 340, 335, 330, 325, 320, 315, 310];
+      case "run":
+        newTimeOptions = [
+          480, 420, 390, 375, 360, 350, 345, 340, 335, 330, 325, 320, 315, 310,
+        ];
         newButtonDistance = 1000;
-        newDistanceText = '1км';
+        newDistanceText = "1км";
         newShowWatts = false;
         break;
-      case 'bike':
+      case "bike":
         newTimeOptions = [160, 150, 140, 130, 120, 110, 105];
         newButtonDistance = 1000;
-        newDistanceText = '1км';
+        newDistanceText = "1км";
         newShowWatts = true;
         break;
       default:
         // Значения по умолчанию (до выбора спорта)
         newTimeOptions = [120, 115, 110, 105, 100, 95, 90];
         newButtonDistance = 100;
-        newDistanceText = '100м';
+        newDistanceText = "100м";
         newShowWatts = false;
     }
 
@@ -79,7 +88,7 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
     setButtonDistance(newButtonDistance);
     setDistanceText(newDistanceText);
     setShowWatts(newShowWatts);
-    
+
     // Сбрасываем выбор при изменении вида спорта
     setSelectedBox(null);
     setSelectedTimeSeconds(null);
@@ -93,19 +102,23 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
   };
 
   return (
-    <View style={{
-      borderRadius: 10, 
-      overflow: 'hidden',
-      backgroundColor: '#F2F2F2',
-      margin: 5,
-    }}>
-      <Text style={{ padding: 10, fontWeight: 'bold' }}>ТВОЙ СПОРТИВНЫЙ УРОВЕНЬ</Text>
-      
+    <View
+      style={{
+        borderRadius: 10,
+        overflow: "hidden",
+        backgroundColor: "#F2F2F2",
+        margin: 5,
+      }}
+    >
+      <Text style={{ padding: 10, fontWeight: "bold" }}>
+        ТВОЙ СПОРТИВНЫЙ УРОВЕНЬ
+      </Text>
+
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={true}
         style={{
-          backgroundColor: '#F2F2F2',
+          backgroundColor: "#F2F2F2",
         }}
         contentContainerStyle={{
           paddingHorizontal: 10,
@@ -119,25 +132,26 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({ onTimeChange, selec
               {
                 width: 70,
                 height: 70,
-                backgroundColor: '#E5E5E5',
+                backgroundColor: "#E5E5E5",
                 marginRight: 10,
                 borderRadius: 10,
                 elevation: 3,
-                shadowColor: '#000',
+                shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.2,
                 shadowRadius: 4,
-                justifyContent: 'center',
-                alignItems: 'center',
+                justifyContent: "center",
+                alignItems: "center",
               },
               selectedBox === index && {
-                backgroundColor: '#BCBCBC',
-              }
+                backgroundColor: "#BCBCBC",
+              },
             ]}
             onPress={() => handleBoxPress(index, timeInSeconds)}
           >
-            <Text style={{ textAlign: 'center', fontSize: 12 }}>
-              {distanceText}{"\n"}
+            <Text style={{ textAlign: "center", fontSize: 12 }}>
+              {distanceText}
+              {"\n"}
               {secondsToTimeString(timeInSeconds)}
               {showWatts && (
                 <>

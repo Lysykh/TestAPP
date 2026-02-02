@@ -1,18 +1,20 @@
-import { useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import SportSelect from './SelectSport';
-import SelectSportLevel from './SelectSportLevel';
-import SelectLevel from './SelectWorckoutLevel';
-import WorckOutMain from './WorckOutMain';
-import styles from './styles';
+import { useState } from "react";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import SportSelect from "./SelectSport";
+import SelectSportLevel from "./SelectSportLevel";
+import SelectLevel from "./SelectWorckoutLevel";
+import WorckOutMain from "./WorckOutMain";
+import styles from "./styles";
 
 export default function HomeScreen() {
   const [showWorkoutMain, setShowWorkoutMain] = useState(false);
-  
-  const [workoutLevel, setWorkoutLevel] = useState(14);
+
+  const [workoutLevel, setWorkoutLevel] = useState(1);
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [selectedTimeSeconds, setSelectedTimeSeconds] = useState<number | null>(null);
+  const [selectedTimeSeconds, setSelectedTimeSeconds] = useState<number | null>(
+    null,
+  );
 
   const toggleWorkoutMode = () => {
     setShowWorkoutMain(!showWorkoutMain);
@@ -21,18 +23,15 @@ export default function HomeScreen() {
   return (
     <View style={styles.homeScreenContainer}>
       <View style={styles.logoContainer}>
-        <Image 
-          source={require('./logo.png')} 
-          style={styles.logoImage}
-        />
+        <Image source={require("./logo.png")} style={styles.logoImage} />
       </View>
-   
+
       {/* Добавляем ScrollView для возможности прокрутки */}
       <ScrollView style={styles.scrollContainer}>
         {showWorkoutMain ? (
           // Показываем только WorckOutMain когда активен режим тренировки
-          <WorckOutMain 
-            workoutLevel={workoutLevel} 
+          <WorckOutMain
+            workoutLevel={workoutLevel}
             setWorkoutLevel={setWorkoutLevel}
             sportType={selectedSport}
             colorType={selectedColor}
@@ -41,13 +40,13 @@ export default function HomeScreen() {
         ) : (
           // Показываем все компоненты кроме WorckOutMain когда не в режиме тренировки
           <>
-            <SportSelect 
+            <SportSelect
               onSportChange={setSelectedSport}
               onColorChange={setSelectedColor}
             />
-            <SelectLevel level={workoutLevel} setLevel={setWorkoutLevel}/>
-            <SelectSportLevel 
-              onTimeChange={setSelectedTimeSeconds} 
+            <SelectLevel level={workoutLevel} setLevel={setWorkoutLevel} />
+            <SelectSportLevel
+              onTimeChange={setSelectedTimeSeconds}
               selectedSport={selectedSport}
             />
           </>
@@ -55,20 +54,17 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* Кнопка остается за пределами ScrollView, чтобы всегда была видна */}
-      <View style={styles.underSector}>   
+      <View style={styles.underSector}>
         <View style={styles.sectors}>
           <View style={styles.buttomGOContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.buttomGO}
               onPress={toggleWorkoutMode}
             >
               <Text style={styles.buttomGOText}>
-                {showWorkoutMain ? 'НАЗАД К НАСТРОЙКАМ' : 'СОЗДАТЬ ТРЕНИРОВКУ'}
+                {showWorkoutMain ? "НАЗАД К НАСТРОЙКАМ" : "СОЗДАТЬ ТРЕНИРОВКУ"}
               </Text>
-              
             </TouchableOpacity>
-
-            
           </View>
         </View>
       </View>

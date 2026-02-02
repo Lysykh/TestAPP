@@ -62,7 +62,7 @@ export default function createTrainingArray_run(temp: number): RunLong[] {
       relaxTemp: temp * 1.29,
       relaxDistance: 400,
       totalDistance: 3200,
-      totalTime: 
+      totalTime: 640,
     },
     {
       id: 2,
@@ -283,5 +283,3 @@ export default function createTrainingArray_run(temp: number): RunLong[] {
 
   return trainingArray;
 }
-
-

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  ScrollView, // Добавлен Modal
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // Импорт функций расчетов
 import createTrainingArray_run from "./calc/runCalc";
@@ -76,6 +83,7 @@ const WorckOutMain = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [gigaResponse, setGigaResponse] = useState<string>("");
   const [loadingGiga, setLoadingGiga] = useState<boolean>(false);
+  const [showMainInfoModal, setShowMainInfoModal] = useState<boolean>(false); // Добавлено состояние для модального окна
 
   const fetchBackendData = async () => {
     setLoading(true);
@@ -107,9 +115,9 @@ const WorckOutMain = ({
 - Темповая работа: ${secondsToTimeString(workoutData.minTemp)} - ${secondsToTimeString(workoutData.maxTemp)}
 - Дистанция темпового отрезка: ${workoutData.distance}м
 - Отдых между повторениями: ${secondsToTimeString(workoutData.relaxTemp)} на ${workoutData.relaxDistance}м
-- Отдых между подходами: 3 минуты
+- Отдых между подходами: 60 секунд
 
-Проанализируй данную тренировку с точки зрения профессионального тренера. повтори кажды элемент тренировки и дай одно или два профессиональных комментария. Не более 100 слов`;
+Проанализируй данную тренировку с точки зрения профессионального тренер. повтори кажды элемент тренировки и дай одно или два профессиональных комментария. Не более 100 слов`;
 
       const response = await fetch(
         `https://crystal-christmas.ru/request_gigachat2/${encodeURIComponent(promptText)}`,
@@ -145,13 +153,15 @@ const WorckOutMain = ({
 
   const getColorName = (color: string | null): string => {
     if (!color) return "не выбран";
-    const colors: { [key: string]: string } = {
-      orange: "оранжевый",
-      green: "зеленый",
-      red: "красный",
+
+    const colorDescriptions: { [key: string]: string } = {
+      green: "Аэробная тренировка. Низкая интенсивность.",
+      orange: "Средняя интенсивность. Тренировка ПАНО.",
+      red: "Высокая интенсивность. Тренировка МПК.",
       grey: "серый",
     };
-    return colors[color] || color;
+
+    return colorDescriptions[color] || color;
   };
 
   const getTrainingArrayFunction = () => {
@@ -225,8 +235,16 @@ const WorckOutMain = ({
 
   const razryad = getSportName(sportType) === "плавание" ? 100 : 1000;
   // по этой формуле среднее время расчитывается как общая дистанция которую мы преодалеем в темпе ПАНО,
+  // Было (простое)
+
   const totalDuration = selectedTimeSeconds
-    ? (workoutData.totalDistance / razryad) * selectedTimeSeconds
+    ? // (workoutData.totalDistance / razryad) * selectedTimeSeconds
+      ((workoutData.distance * workoutData.reps * workoutData.sets) / razryad) *
+        workoutData.minTemp +
+      ((workoutData.relaxDistance * workoutData.reps * workoutData.sets) /
+        razryad) *
+        workoutData.relaxTemp +
+      1200
     : 0;
 
   return (
@@ -247,7 +265,7 @@ const WorckOutMain = ({
           <Text style={simpleStyles.value}>{getColorName(colorType)}</Text>
         </View>
         <View style={simpleStyles.infoRow}>
-          <Text style={simpleStyles.label}>Общая дистанция:</Text>
+          <Text style={simpleStyles.label}>Дистанция работы:</Text>
           <Text style={simpleStyles.value}>{workoutData.totalDistance}м</Text>
         </View>
         <View style={simpleStyles.infoRow}>
@@ -301,68 +319,92 @@ const WorckOutMain = ({
 
       {/* Основное задание */}
       <View style={simpleStyles.section}>
-        <Text style={simpleStyles.sectionTitle}>ОСНОВНОЕ ЗАДАНИЕ</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={simpleStyles.sectionTitle}>ОСНОВНОЕ ЗАДАНИЕ</Text>
+          <TouchableOpacity
+            onPress={() => setShowMainInfoModal(true)}
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: "#007AFF",
+              justifyContent: "center",
+              alignItems: "center",
+              marginLeft: 8,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>?</Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={simpleStyles.exerciseBlock}>
           <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Подходы:</Text>
+            <Text style={simpleStyles.exerciseLabel}>Количество подходов:</Text>
             <Text style={simpleStyles.exerciseValue}>{workoutData.sets}</Text>
           </View>
           <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Повторения:</Text>
+            <Text style={simpleStyles.exerciseLabel}>
+              Количество повторов в подходе:
+            </Text>
             <Text style={simpleStyles.exerciseValue}>{workoutData.reps}</Text>
           </View>
 
           <View style={simpleStyles.divider} />
 
-          <Text style={simpleStyles.subtitle}>Основное упражнение:</Text>
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
-            <Text style={simpleStyles.exerciseValue}>
-              {secondsToTimeString(workoutData.minTemp)} -{" "}
-              {secondsToTimeString(workoutData.maxTemp)}
-            </Text>
-          </View>
-          {sportType === "bike" &&
-            !isNaN(workoutData.minWatt) &&
-            !isNaN(workoutData.maxWatt) && (
-              <View style={simpleStyles.exerciseRow}>
-                <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
-                <Text style={simpleStyles.exerciseValue}>
-                  {Math.round(workoutData.minWatt)} -{" "}
-                  {Math.round(workoutData.maxWatt)}W
-                </Text>
-              </View>
-            )}
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Дистанция:</Text>
-            <Text style={simpleStyles.exerciseValue}>
-              {workoutData.distance}м
-            </Text>
+          {/* Рабочая часть повтора */}
+          <View style={simpleStyles.indentedBlock}>
+            <Text style={simpleStyles.subtitle}>Рабочая часть повтора:</Text>
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
+              <Text style={simpleStyles.exerciseValue}>
+                {secondsToTimeString(workoutData.minTemp)} -{" "}
+                {secondsToTimeString(workoutData.maxTemp)}
+              </Text>
+            </View>
+            {sportType === "bike" &&
+              !isNaN(workoutData.minWatt) &&
+              !isNaN(workoutData.maxWatt) && (
+                <View style={simpleStyles.exerciseRow}>
+                  <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
+                  <Text style={simpleStyles.exerciseValue}>
+                    {Math.round(workoutData.minWatt)} -{" "}
+                    {Math.round(workoutData.maxWatt)}W
+                  </Text>
+                </View>
+              )}
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>Дистанция:</Text>
+              <Text style={simpleStyles.exerciseValue}>
+                {workoutData.distance}м
+              </Text>
+            </View>
           </View>
 
           <View style={simpleStyles.divider} />
 
-          <Text style={simpleStyles.subtitle}>Отдых:</Text>
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Время:</Text>
-            <Text style={simpleStyles.exerciseValue}>
-              {secondsToTimeString(workoutData.relaxTemp)}
-            </Text>
-          </View>
-          {sportType === "bike" && !isNaN(workoutData.relaxWatt) && (
+          {/* Отдых в повторе */}
+          <View style={simpleStyles.indentedBlock}>
+            <Text style={simpleStyles.subtitle}>Отдых в повторе:</Text>
             <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
+              <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
               <Text style={simpleStyles.exerciseValue}>
-                {Math.round(workoutData.relaxWatt)}W
+                {secondsToTimeString(workoutData.relaxTemp)}
               </Text>
             </View>
-          )}
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Дистанция:</Text>
-            <Text style={simpleStyles.exerciseValue}>
-              {workoutData.relaxDistance}м
-            </Text>
+            {sportType === "bike" && !isNaN(workoutData.relaxWatt) && (
+              <View style={simpleStyles.exerciseRow}>
+                <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
+                <Text style={simpleStyles.exerciseValue}>
+                  {Math.round(workoutData.relaxWatt)}W
+                </Text>
+              </View>
+            )}
+            <View style={simpleStyles.exerciseRow}>
+              <Text style={simpleStyles.exerciseLabel}>Дистанция:</Text>
+              <Text style={simpleStyles.exerciseValue}>
+                {workoutData.relaxDistance}м
+              </Text>
+            </View>
           </View>
 
           <View style={simpleStyles.divider} />
@@ -371,7 +413,7 @@ const WorckOutMain = ({
             <Text style={simpleStyles.exerciseLabel}>
               Отдых между подходами:
             </Text>
-            <Text style={simpleStyles.exerciseValue}>3 минуты</Text>
+            <Text style={simpleStyles.exerciseValue}>60 секунд</Text>
           </View>
         </View>
       </View>
@@ -444,6 +486,34 @@ const WorckOutMain = ({
           </View>
         ) : null}
       </View>
+
+      {/* Модальное окно с подсказкой для основного задания */}
+      <Modal
+        visible={showMainInfoModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowMainInfoModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Основное задание</Text>
+            <Text style={styles.modalText}>
+              Рабочая часть повтора - основной развивающий элемент тренировки.
+            </Text>
+            <Text style={styles.modalDescription}>
+              Отдых внутри повтора - это элемент тренировки, который необходимо
+              выполнять без остановки сразу после Рабочей части. Однако темп
+              этого элемента существенно снижен по сравнению с рабочей частью.
+            </Text>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowMainInfoModal(false)}
+            >
+              <Text style={styles.closeButtonText}>ЗАКРЫТЬ ПОДСКАЗКУ</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -452,19 +522,19 @@ const WorckOutMain = ({
 const simpleStyles = {
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fafafa",
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   section: {
     backgroundColor: "white",
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 16,
     marginBottom: 12,
-    elevation: 2,
+    elevation: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 2,
   },
   sectionTitle: {
@@ -477,9 +547,9 @@ const simpleStyles = {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    borderBottomColor: "#f5f5f5",
   },
   label: {
     fontSize: 14,
@@ -494,13 +564,17 @@ const simpleStyles = {
     textAlign: "right",
   },
   exerciseBlock: {
-    marginTop: 8,
+    marginTop: 4,
+  },
+  indentedBlock: {
+    marginLeft: 16,
+    marginTop: 4,
   },
   exerciseRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 6,
+    paddingVertical: 4,
   },
   exerciseLabel: {
     fontSize: 14,
@@ -515,22 +589,23 @@ const simpleStyles = {
     textAlign: "right",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
-    color: "#333",
-    marginTop: 12,
-    marginBottom: 8,
+    color: "#444",
+    marginTop: 8,
+    marginBottom: 6,
+    marginLeft: 0,
   },
   divider: {
     height: 1,
-    backgroundColor: "#e0e0e0",
-    marginVertical: 12,
+    backgroundColor: "#f0f0f0",
+    marginVertical: 10,
   },
   button: {
     backgroundColor: "#ff6b35",
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 6,
+    borderRadius: 8,
     alignItems: "center",
     marginVertical: 12,
   },
@@ -560,5 +635,64 @@ const simpleStyles = {
     marginBottom: 12,
   },
 };
+
+// Стили для модального окна
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 20,
+    width: "100%",
+    maxWidth: 400,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#333",
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#444",
+    lineHeight: 22,
+  },
+  modalDescription: {
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#666",
+    lineHeight: 20,
+  },
+  closeButton: {
+    backgroundColor: "#FF9500",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+});
 
 export default WorckOutMain;
