@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface SelectSportLevelProps {
   onTimeChange: (timeInSeconds: number | null) => void;
@@ -15,7 +22,9 @@ const timeStringToSeconds = (timeString: string): number => {
 const secondsToTimeString = (totalSeconds: number): string => {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = Math.floor(totalSeconds % 60);
-  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  return `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
 };
 
 // Альтернативный вариант с фиксированными значениями ватт
@@ -47,6 +56,7 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({
   const [buttonDistance, setButtonDistance] = useState<number>(100);
   const [distanceText, setDistanceText] = useState<string>("100м");
   const [showWatts, setShowWatts] = useState<boolean>(false);
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
 
   // Обновляем параметры при изменении выбранного вида спорта
   useEffect(() => {
@@ -101,71 +111,189 @@ const SelectSportLevel: React.FC<SelectSportLevelProps> = ({
     onTimeChange(timeInSeconds);
   };
 
-  return (
-    <View
-      style={{
-        borderRadius: 10,
-        overflow: "hidden",
-        backgroundColor: "#F2F2F2",
-        margin: 5,
-      }}
-    >
-      <Text style={{ padding: 10, fontWeight: "bold" }}>
-        ТВОЙ СПОРТИВНЫЙ УРОВЕНЬ
-      </Text>
+  const getSportInfoText = () => {
+    switch (selectedSport) {
+      case "swim":
+        return "С каким темпом вы можете проплыть 1 000 м";
+      case "run":
+        return "С каким темпом вы можете пробежать 5 000 м";
+      case "bike":
+        return "С каким темпом вы можете проехать 10 000 м";
+      default:
+        return "Выберите вид спорта для получения информации о темпе";
+    }
+  };
 
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={true}
+  return (
+    <>
+      <View
         style={{
+          borderRadius: 10,
+          overflow: "hidden",
           backgroundColor: "#F2F2F2",
-        }}
-        contentContainerStyle={{
-          paddingHorizontal: 10,
-          paddingVertical: 20,
+          margin: 5,
         }}
       >
-        {timeOptionsInSeconds.map((timeInSeconds, index) => (
+        <View
+          style={{ flexDirection: "row", alignItems: "center", padding: 10 }}
+        >
+          <Text style={{ fontWeight: "bold", flex: 1 }}>
+            ТВОЙ СОРЕВНОВАТЕЛЬНЫЙ ТЕМП (темп ПАНО)
+          </Text>
           <TouchableOpacity
-            key={timeInSeconds}
-            style={[
-              {
-                width: 70,
-                height: 70,
-                backgroundColor: "#E5E5E5",
-                marginRight: 10,
-                borderRadius: 10,
-                elevation: 3,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 4,
-                justifyContent: "center",
-                alignItems: "center",
-              },
-              selectedBox === index && {
-                backgroundColor: "#BCBCBC",
-              },
-            ]}
-            onPress={() => handleBoxPress(index, timeInSeconds)}
+            onPress={() => setShowInfoModal(true)}
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: "#007AFF",
+              justifyContent: "center",
+              alignItems: "center",
+              marginLeft: 5,
+            }}
           >
-            <Text style={{ textAlign: "center", fontSize: 12 }}>
-              {distanceText}
-              {"\n"}
-              {secondsToTimeString(timeInSeconds)}
-              {showWatts && (
-                <>
-                  {"\n"}
-                  {getWattsForTime(timeInSeconds)}W
-                </>
-              )}
-            </Text>
+            <Text style={{ color: "white", fontWeight: "bold" }}>?</Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
+        </View>
+
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={true}
+          style={{
+            backgroundColor: "#F2F2F2",
+          }}
+          contentContainerStyle={{
+            paddingHorizontal: 10,
+            paddingVertical: 20,
+          }}
+        >
+          {timeOptionsInSeconds.map((timeInSeconds, index) => (
+            <TouchableOpacity
+              key={timeInSeconds}
+              style={[
+                {
+                  width: 70,
+                  height: 70,
+                  backgroundColor: "#E5E5E5",
+                  marginRight: 10,
+                  borderRadius: 10,
+                  elevation: 3,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+                selectedBox === index && {
+                  backgroundColor: "#BCBCBC",
+                },
+              ]}
+              onPress={() => handleBoxPress(index, timeInSeconds)}
+            >
+              <Text style={{ textAlign: "center", fontSize: 12 }}>
+                {distanceText}
+                {"\n"}
+                {secondsToTimeString(timeInSeconds)}
+                {showWatts && (
+                  <>
+                    {"\n"}
+                    {getWattsForTime(timeInSeconds)}W
+                  </>
+                )}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Модальное окно с подсказкой */}
+      <Modal
+        visible={showInfoModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowInfoModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Информация о темпе</Text>
+            <Text style={styles.modalText}>{getSportInfoText()}</Text>
+            <Text style={styles.modalDescription}>
+              Выберите время, с которым вы можете преодолеть указанную дистанцию
+              в соревновательном темпе. Этот показатель поможет определить ваш
+              уровень подготовки и подобрать оптимальную нагрузку для
+              тренировок.
+            </Text>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowInfoModal(false)}
+            >
+              <Text style={styles.closeButtonText}>ЗАКРЫТЬ ПОДСКАЗКУ</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 20,
+    width: "100%",
+    maxWidth: 400,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#333",
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#444",
+    lineHeight: 22,
+  },
+  modalDescription: {
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#666",
+    lineHeight: 20,
+  },
+  closeButton: {
+    backgroundColor: "#FF9500",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+});
 
 // Экспортируем вспомогательные функции для использования в других компонентах
 export { getWattsForTime, secondsToTimeString, timeStringToSeconds };
