@@ -453,7 +453,7 @@ const WorckOutMain = ({
           disabled={loadingGiga}
         >
           <Text style={simpleStyles.buttonText}>
-            {loadingGiga ? "Загрузка..." : "Спросить у GigaChat"}
+            {loadingGiga ? "Загрузка..." : "Спросить у AI Тренера"}
           </Text>
         </TouchableOpacity>
 
