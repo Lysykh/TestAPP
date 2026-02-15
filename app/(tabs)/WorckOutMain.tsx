@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import {
   Modal,
   ScrollView, // Добавлен Modal
@@ -20,6 +21,7 @@ import createTrainingArray_red_swim from "./calc/swimCalcRed";
 import createTrainingArray_bike from "./calc/bikeCalc";
 import createTrainingArray_orange_bike from "./calc/bikeCalcOrange";
 import createTrainingArray_red_bike from "./calc/bikeCalcRed";
+
 
 import { getWattsForTime, secondsToTimeString } from "./SelectSportLevel";
 
