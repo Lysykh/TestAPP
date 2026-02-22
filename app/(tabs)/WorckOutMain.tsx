@@ -1,13 +1,14 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
-
 import {
+  Alert,
   Modal,
-  ScrollView, // Добавлен Modal
-  StyleSheet,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import styles from "./styles";
 
 // Импорт функций расчетов
 import createTrainingArray_run from "./calc/runCalc";
@@ -21,7 +22,6 @@ import createTrainingArray_red_swim from "./calc/swimCalcRed";
 import createTrainingArray_bike from "./calc/bikeCalc";
 import createTrainingArray_orange_bike from "./calc/bikeCalcOrange";
 import createTrainingArray_red_bike from "./calc/bikeCalcRed";
-
 
 import { getWattsForTime, secondsToTimeString } from "./SelectSportLevel";
 
@@ -48,6 +48,7 @@ interface WorckOutMainProps {
   sportType: string | null;
   colorType: string | null;
   selectedTimeSeconds: number | null;
+  sportlevel: number;
 }
 
 interface BackendItem {
@@ -56,9 +57,21 @@ interface BackendItem {
   age: string;
 }
 
+// Интерфейс для сохраненной тренировки
+interface SavedWorkout {
+  id: string;
+  date: string;
+  color: string;
+  watt: number;
+  temp: number;
+  workoutlevel: number;
+  sportlevel: number;
+  sportType: string;
+  totalDistance: number;
+  duration: number;
+}
+
 // Конфигурация временных порогов для разных видов спорта
-// временные пороги это те пороги после которых тренировка стартует с уровня + 3 и +6 по сравнению с базовым .
-// Пользователь реальный вроень тренировки не видит и всегда видит как первый
 const SPORT_TIME_THRESHOLDS = {
   swim: {
     high: 149,
@@ -74,18 +87,21 @@ const SPORT_TIME_THRESHOLDS = {
   },
 } as const;
 
+const STORAGE_KEY = "@workout_history";
+
 const WorckOutMain = ({
   workoutLevel,
   sportType,
   colorType,
-  // selectedTimeSeconds - это переменная которая обозначает какой мы выбрали ПАНО Для того чтобы посчитать среднее время тренировки нужно брать не ПАНО
   selectedTimeSeconds,
+  sportlevel,
 }: WorckOutMainProps) => {
   const [backendData, setBackendData] = useState<BackendItem | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [gigaResponse, setGigaResponse] = useState<string>("");
   const [loadingGiga, setLoadingGiga] = useState<boolean>(false);
-  const [showMainInfoModal, setShowMainInfoModal] = useState<boolean>(false); // Добавлено состояние для модального окна
+  const [showMainInfoModal, setShowMainInfoModal] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
 
   const fetchBackendData = async () => {
     setLoading(true);
@@ -99,6 +115,67 @@ const WorckOutMain = ({
       console.error("Error fetching backend data:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Функция сохранения тренировки локально
+  const saveWorkoutLocally = async () => {
+    if (
+      !workoutData ||
+      !sportType ||
+      !colorType ||
+      selectedTimeSeconds === null
+    ) {
+      Alert.alert("Ошибка", "Не все данные тренировки доступны");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // Получаем существующие тренировки
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      const savedWorkouts: SavedWorkout[] = stored ? JSON.parse(stored) : [];
+
+      const currentDate = new Date().toISOString();
+      const razryad = getSportName(sportType) === "плавание" ? 100 : 1000;
+
+      const totalDuration = selectedTimeSeconds
+        ? ((workoutData.distance * workoutData.reps * workoutData.sets) /
+            razryad) *
+            workoutData.minTemp +
+          ((workoutData.relaxDistance * workoutData.reps * workoutData.sets) /
+            razryad) *
+            workoutData.relaxTemp +
+          1200
+        : 0;
+
+      const newWorkout: SavedWorkout = {
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        date: currentDate,
+        color: colorType,
+        watt: workoutData.watt || 0,
+        temp: workoutData.minTemp || 0,
+        workoutlevel: workoutLevel,
+        sportlevel: sportlevel,
+        sportType: sportType,
+        totalDistance: workoutData.totalDistance,
+        duration: totalDuration,
+      };
+
+      // Добавляем новую тренировку в начало массива
+      const updatedWorkouts = [newWorkout, ...savedWorkouts];
+
+      // Сохраняем в AsyncStorage
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedWorkouts));
+
+      Alert.alert("Успешно", "Тренировка отмечена как выполненная", [
+        { text: "OK" },
+      ]);
+    } catch (err) {
+      console.error("Error saving workout locally:", err);
+      Alert.alert("Ошибка", "Не удалось сохранить данные тренировки");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -146,9 +223,9 @@ const WorckOutMain = ({
   const getSportName = (sport: string | null): string => {
     if (!sport) return "не выбран";
     const sports: { [key: string]: string } = {
-      swim: "плавание",
-      run: "бег",
-      bike: "велосипед",
+      swim: "🏊 Плавание",
+      run: "🏃 Бег",
+      bike: "🚴 Велосипед",
     };
     return sports[sport] || sport;
   };
@@ -226,9 +303,9 @@ const WorckOutMain = ({
 
   if (!workoutData) {
     return (
-      <View style={simpleStyles.container}>
-        <Text style={simpleStyles.title}>Данные тренировки не найдены</Text>
-        <Text style={simpleStyles.text}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Данные тренировки не найдены</Text>
+        <Text style={styles.text}>
           Пожалуйста, выберите время и уровень тренировки
         </Text>
       </View>
@@ -236,12 +313,9 @@ const WorckOutMain = ({
   }
 
   const razryad = getSportName(sportType) === "плавание" ? 100 : 1000;
-  // по этой формуле среднее время расчитывается как общая дистанция которую мы преодалеем в темпе ПАНО,
-  // Было (простое)
 
   const totalDuration = selectedTimeSeconds
-    ? // (workoutData.totalDistance / razryad) * selectedTimeSeconds
-      ((workoutData.distance * workoutData.reps * workoutData.sets) / razryad) *
+    ? ((workoutData.distance * workoutData.reps * workoutData.sets) / razryad) *
         workoutData.minTemp +
       ((workoutData.relaxDistance * workoutData.reps * workoutData.sets) /
         razryad) *
@@ -250,44 +324,46 @@ const WorckOutMain = ({
     : 0;
 
   return (
-    <ScrollView style={simpleStyles.container}>
+    <ScrollView style={styles.worckOutMainContainer}>
       {/* Заголовок тренировки */}
-      <View style={simpleStyles.section}>
-        <Text style={simpleStyles.sectionTitle}>О ТРЕНИРОВКЕ</Text>
-        <View style={simpleStyles.infoRow}>
-          <Text style={simpleStyles.label}>Уровень:</Text>
-          <Text style={simpleStyles.value}>{workoutLevel}</Text>
+      <View style={styles.workoutSection}>
+        <Text style={styles.workoutSectionTitle}>О ТРЕНИРОВКЕ</Text>
+        <View style={styles.workoutInfoRow}>
+          <Text style={styles.workoutInfoLabel}>Уровень:</Text>
+          <Text style={styles.workoutInfoValue}>{workoutLevel}</Text>
         </View>
-        <View style={simpleStyles.infoRow}>
-          <Text style={simpleStyles.label}>Спорт:</Text>
-          <Text style={simpleStyles.value}>{getSportName(sportType)}</Text>
+        <View style={styles.workoutInfoRow}>
+          <Text style={styles.workoutInfoLabel}>Спорт:</Text>
+          <Text style={styles.workoutInfoValue}>{getSportName(sportType)}</Text>
         </View>
-        <View style={simpleStyles.infoRow}>
-          <Text style={simpleStyles.label}>Цвет:</Text>
-          <Text style={simpleStyles.value}>{getColorName(colorType)}</Text>
+        <View style={styles.workoutInfoRow}>
+          <Text style={styles.workoutInfoLabel}>Цвет:</Text>
+          <Text style={styles.workoutInfoValue}>{getColorName(colorType)}</Text>
         </View>
-        <View style={simpleStyles.infoRow}>
-          <Text style={simpleStyles.label}>Дистанция работы:</Text>
-          <Text style={simpleStyles.value}>{workoutData.totalDistance}м</Text>
+        <View style={styles.workoutInfoRow}>
+          <Text style={styles.workoutInfoLabel}>Дистанция работы:</Text>
+          <Text style={styles.workoutInfoValue}>
+            {workoutData.totalDistance}м
+          </Text>
         </View>
-        <View style={simpleStyles.infoRow}>
-          <Text style={simpleStyles.label}>Общая продолжительность:</Text>
-          <Text style={simpleStyles.value}>
+        <View style={styles.workoutInfoRow}>
+          <Text style={styles.workoutInfoLabel}>Общая продолжительность:</Text>
+          <Text style={styles.workoutInfoValue}>
             {secondsToTimeString(totalDuration)}
           </Text>
         </View>
-        <View style={simpleStyles.infoRow}>
-          <Text style={simpleStyles.label}>Темп ПАНО:</Text>
-          <Text style={simpleStyles.value}>
+        <View style={styles.workoutInfoRow}>
+          <Text style={styles.workoutInfoLabel}>Темп ПАНО:</Text>
+          <Text style={styles.workoutInfoValue}>
             {selectedTimeSeconds !== null
               ? secondsToTimeString(selectedTimeSeconds)
               : "не выбрано"}
           </Text>
         </View>
         {sportType === "bike" && !isNaN(workoutData.watt) && (
-          <View style={simpleStyles.infoRow}>
-            <Text style={simpleStyles.label}>Мощность ПАНО:</Text>
-            <Text style={simpleStyles.value}>
+          <View style={styles.workoutInfoRow}>
+            <Text style={styles.workoutInfoLabel}>Мощность ПАНО:</Text>
+            <Text style={styles.workoutInfoValue}>
               {Math.round(workoutData.watt)}W
             </Text>
           </View>
@@ -295,23 +371,23 @@ const WorckOutMain = ({
       </View>
 
       {/* Разминка */}
-      <View style={simpleStyles.section}>
-        <Text style={simpleStyles.sectionTitle}>РАЗМИНКА</Text>
-        <View style={simpleStyles.exerciseBlock}>
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Время:</Text>
-            <Text style={simpleStyles.exerciseValue}>10:00</Text>
+      <View style={styles.workoutSection}>
+        <Text style={styles.workoutSectionTitle}>РАЗМИНКА</Text>
+        <View style={styles.workoutExerciseBlock}>
+          <View style={styles.workoutExerciseRow}>
+            <Text style={styles.workoutExerciseLabel}>Время:</Text>
+            <Text style={styles.workoutExerciseValue}>10:00</Text>
           </View>
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
-            <Text style={simpleStyles.exerciseValue}>
+          <View style={styles.workoutExerciseRow}>
+            <Text style={styles.workoutExerciseLabel}>Темп:</Text>
+            <Text style={styles.workoutExerciseValue}>
               {secondsToTimeString(workoutData.relaxTemp)}
             </Text>
           </View>
           {sportType === "bike" && !isNaN(workoutData.relaxWatt) && (
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
-              <Text style={simpleStyles.exerciseValue}>
+            <View style={styles.workoutExerciseRow}>
+              <Text style={styles.workoutExerciseLabel}>Мощность:</Text>
+              <Text style={styles.workoutExerciseValue}>
                 {Math.round(workoutData.relaxWatt)}W
               </Text>
             </View>
@@ -320,45 +396,39 @@ const WorckOutMain = ({
       </View>
 
       {/* Основное задание */}
-      <View style={simpleStyles.section}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={simpleStyles.sectionTitle}>ОСНОВНОЕ ЗАДАНИЕ</Text>
+      <View style={styles.workoutSection}>
+        <View style={styles.workoutTitleWithHelp}>
+          <Text style={styles.workoutSectionTitle}>ОСНОВНОЕ ЗАДАНИЕ</Text>
           <TouchableOpacity
             onPress={() => setShowMainInfoModal(true)}
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: 12,
-              backgroundColor: "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginLeft: 8,
-            }}
+            style={styles.helpButton}
           >
-            <Text style={{ color: "white", fontWeight: "bold" }}>?</Text>
+            <Text style={styles.helpButtonText}>?</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={simpleStyles.exerciseBlock}>
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Количество подходов:</Text>
-            <Text style={simpleStyles.exerciseValue}>{workoutData.sets}</Text>
+        <View style={styles.workoutExerciseBlock}>
+          <View style={styles.workoutExerciseRow}>
+            <Text style={styles.workoutExerciseLabel}>
+              Количество подходов:
+            </Text>
+            <Text style={styles.workoutExerciseValue}>{workoutData.sets}</Text>
           </View>
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>
+          <View style={styles.workoutExerciseRow}>
+            <Text style={styles.workoutExerciseLabel}>
               Количество повторов в подходе:
             </Text>
-            <Text style={simpleStyles.exerciseValue}>{workoutData.reps}</Text>
+            <Text style={styles.workoutExerciseValue}>{workoutData.reps}</Text>
           </View>
 
-          <View style={simpleStyles.divider} />
+          <View style={styles.workoutDivider} />
 
           {/* Рабочая часть повтора */}
-          <View style={simpleStyles.indentedBlock}>
-            <Text style={simpleStyles.subtitle}>Рабочая часть повтора:</Text>
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
-              <Text style={simpleStyles.exerciseValue}>
+          <View style={styles.workoutIndentedBlock}>
+            <Text style={styles.workoutSubtitle}>Рабочая часть повтора:</Text>
+            <View style={styles.workoutExerciseRow}>
+              <Text style={styles.workoutExerciseLabel}>Темп:</Text>
+              <Text style={styles.workoutExerciseValue}>
                 {secondsToTimeString(workoutData.minTemp)} -{" "}
                 {secondsToTimeString(workoutData.maxTemp)}
               </Text>
@@ -366,78 +436,78 @@ const WorckOutMain = ({
             {sportType === "bike" &&
               !isNaN(workoutData.minWatt) &&
               !isNaN(workoutData.maxWatt) && (
-                <View style={simpleStyles.exerciseRow}>
-                  <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
-                  <Text style={simpleStyles.exerciseValue}>
+                <View style={styles.workoutExerciseRow}>
+                  <Text style={styles.workoutExerciseLabel}>Мощность:</Text>
+                  <Text style={styles.workoutExerciseValue}>
                     {Math.round(workoutData.minWatt)} -{" "}
                     {Math.round(workoutData.maxWatt)}W
                   </Text>
                 </View>
               )}
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Дистанция:</Text>
-              <Text style={simpleStyles.exerciseValue}>
+            <View style={styles.workoutExerciseRow}>
+              <Text style={styles.workoutExerciseLabel}>Дистанция:</Text>
+              <Text style={styles.workoutExerciseValue}>
                 {workoutData.distance}м
               </Text>
             </View>
           </View>
 
-          <View style={simpleStyles.divider} />
+          <View style={styles.workoutDivider} />
 
           {/* Отдых в повторе */}
-          <View style={simpleStyles.indentedBlock}>
-            <Text style={simpleStyles.subtitle}>Отдых в повторе:</Text>
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
-              <Text style={simpleStyles.exerciseValue}>
+          <View style={styles.workoutIndentedBlock}>
+            <Text style={styles.workoutSubtitle}>Отдых в повторе:</Text>
+            <View style={styles.workoutExerciseRow}>
+              <Text style={styles.workoutExerciseLabel}>Темп:</Text>
+              <Text style={styles.workoutExerciseValue}>
                 {secondsToTimeString(workoutData.relaxTemp)}
               </Text>
             </View>
             {sportType === "bike" && !isNaN(workoutData.relaxWatt) && (
-              <View style={simpleStyles.exerciseRow}>
-                <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
-                <Text style={simpleStyles.exerciseValue}>
+              <View style={styles.workoutExerciseRow}>
+                <Text style={styles.workoutExerciseLabel}>Мощность:</Text>
+                <Text style={styles.workoutExerciseValue}>
                   {Math.round(workoutData.relaxWatt)}W
                 </Text>
               </View>
             )}
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Дистанция:</Text>
-              <Text style={simpleStyles.exerciseValue}>
+            <View style={styles.workoutExerciseRow}>
+              <Text style={styles.workoutExerciseLabel}>Дистанция:</Text>
+              <Text style={styles.workoutExerciseValue}>
                 {workoutData.relaxDistance}м
               </Text>
             </View>
           </View>
 
-          <View style={simpleStyles.divider} />
+          <View style={styles.workoutDivider} />
 
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>
+          <View style={styles.workoutExerciseRow}>
+            <Text style={styles.workoutExerciseLabel}>
               Отдых между подходами:
             </Text>
-            <Text style={simpleStyles.exerciseValue}>60 секунд</Text>
+            <Text style={styles.workoutExerciseValue}>60 секунд</Text>
           </View>
         </View>
       </View>
 
       {/* Заминка */}
-      <View style={simpleStyles.section}>
-        <Text style={simpleStyles.sectionTitle}>ЗАМИНКА</Text>
-        <View style={simpleStyles.exerciseBlock}>
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Время:</Text>
-            <Text style={simpleStyles.exerciseValue}>10:00</Text>
+      <View style={styles.workoutSection}>
+        <Text style={styles.workoutSectionTitle}>ЗАМИНКА</Text>
+        <View style={styles.workoutExerciseBlock}>
+          <View style={styles.workoutExerciseRow}>
+            <Text style={styles.workoutExerciseLabel}>Время:</Text>
+            <Text style={styles.workoutExerciseValue}>10:00</Text>
           </View>
-          <View style={simpleStyles.exerciseRow}>
-            <Text style={simpleStyles.exerciseLabel}>Темп:</Text>
-            <Text style={simpleStyles.exerciseValue}>
+          <View style={styles.workoutExerciseRow}>
+            <Text style={styles.workoutExerciseLabel}>Темп:</Text>
+            <Text style={styles.workoutExerciseValue}>
               {secondsToTimeString(workoutData.relaxTemp)}
             </Text>
           </View>
           {sportType === "bike" && !isNaN(workoutData.relaxWatt) && (
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Мощность:</Text>
-              <Text style={simpleStyles.exerciseValue}>
+            <View style={styles.workoutExerciseRow}>
+              <Text style={styles.workoutExerciseLabel}>Мощность:</Text>
+              <Text style={styles.workoutExerciseValue}>
                 {Math.round(workoutData.relaxWatt)}W
               </Text>
             </View>
@@ -446,47 +516,43 @@ const WorckOutMain = ({
       </View>
 
       {/* Данные из базы данных */}
-      <View style={simpleStyles.section}>
-        <Text style={simpleStyles.sectionTitle}>КОНСУЛЬТАЦИЯ AI</Text>
+      <View style={styles.workoutSection}>
+        <Text style={styles.workoutSectionTitle}>КОНСУЛЬТАЦИЯ AI</Text>
 
         <TouchableOpacity
-          style={simpleStyles.button}
+          style={[styles.workoutButton, styles.primaryButton]}
           onPress={callGigaChat}
           disabled={loadingGiga}
         >
-          <Text style={simpleStyles.buttonText}>
+          <Text style={styles.workoutButtonText}>
             {loadingGiga ? "Загрузка..." : "Спросить у AI Тренера"}
           </Text>
         </TouchableOpacity>
 
-        {/* {loading ? (
-          <Text style={simpleStyles.text}>Загрузка данных...</Text>
-        ) : backendData ? (
-          <View style={simpleStyles.exerciseBlock}>
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>ID:</Text>
-              <Text style={simpleStyles.exerciseValue}>{backendData.id}</Text>
-            </View>
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Имя:</Text>
-              <Text style={simpleStyles.exerciseValue}>{backendData.name}</Text>
-            </View>
-            <View style={simpleStyles.exerciseRow}>
-              <Text style={simpleStyles.exerciseLabel}>Возраст:</Text>
-              <Text style={simpleStyles.exerciseValue}>{backendData.age}</Text>
-            </View>
-          </View>
-        ) : (
-          <Text style={simpleStyles.text}>Данные не получены</Text>
-        )} */}
-
         {/* Ответ GigaChat */}
         {gigaResponse ? (
-          <View style={simpleStyles.exerciseBlock}>
-            <Text style={simpleStyles.sectionTitle}>КОНСУЛЬТАЦИЯ AI:</Text>
-            <Text style={simpleStyles.gigaText}>{gigaResponse}</Text>
+          <View style={styles.workoutExerciseBlock}>
+            <Text style={styles.workoutSectionTitle}>КОНСУЛЬТАЦИЯ AI:</Text>
+            <Text style={styles.gigaText}>{gigaResponse}</Text>
           </View>
         ) : null}
+      </View>
+
+      {/* Кнопка "ВЫПОЛНИЛ" */}
+      <View style={styles.workoutSection}>
+        <TouchableOpacity
+          style={[
+            styles.workoutCompleteButton,
+            styles.primaryButton,
+            saving && styles.disabledButton,
+          ]}
+          onPress={saveWorkoutLocally}
+          disabled={saving}
+        >
+          <Text style={styles.workoutCompleteButtonText}>
+            {saving ? "Сохранение..." : "✓ ВЫПОЛНИЛ"}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Модальное окно с подсказкой для основного задания */}
@@ -508,7 +574,7 @@ const WorckOutMain = ({
               этого элемента существенно снижен по сравнению с рабочей частью.
             </Text>
             <TouchableOpacity
-              style={styles.closeButton}
+              style={[styles.closeButton, styles.primaryButton]}
               onPress={() => setShowMainInfoModal(false)}
             >
               <Text style={styles.closeButtonText}>ЗАКРЫТЬ ПОДСКАЗКУ</Text>
@@ -519,182 +585,5 @@ const WorckOutMain = ({
     </ScrollView>
   );
 };
-
-// Упрощенные стили
-const simpleStyles = {
-  container: {
-    flex: 1,
-    backgroundColor: "#fafafa",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  section: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 12,
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f5f5f5",
-  },
-  label: {
-    fontSize: 14,
-    color: "#666",
-    flex: 1,
-  },
-  value: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "500",
-    flex: 1,
-    textAlign: "right",
-  },
-  exerciseBlock: {
-    marginTop: 4,
-  },
-  indentedBlock: {
-    marginLeft: 16,
-    marginTop: 4,
-  },
-  exerciseRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 4,
-  },
-  exerciseLabel: {
-    fontSize: 14,
-    color: "#666",
-    flex: 1,
-  },
-  exerciseValue: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "500",
-    flex: 1,
-    textAlign: "right",
-  },
-  subtitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#444",
-    marginTop: 8,
-    marginBottom: 6,
-    marginLeft: 0,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#f0f0f0",
-    marginVertical: 10,
-  },
-  button: {
-    backgroundColor: "#ff6b35",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginVertical: 12,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  text: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-    paddingVertical: 12,
-  },
-  gigaText: {
-    fontSize: 14,
-    color: "#333",
-    fontStyle: "italic",
-    lineHeight: 20,
-    marginTop: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 12,
-  },
-};
-
-// Стили для модального окна
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 20,
-    width: "100%",
-    maxWidth: 400,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-    color: "#333",
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 15,
-    textAlign: "center",
-    color: "#444",
-    lineHeight: 22,
-  },
-  modalDescription: {
-    fontSize: 14,
-    marginBottom: 20,
-    textAlign: "center",
-    color: "#666",
-    lineHeight: 20,
-  },
-  closeButton: {
-    backgroundColor: "#FF9500",
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    alignItems: "center",
-  },
-  closeButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-});
 
 export default WorckOutMain;
