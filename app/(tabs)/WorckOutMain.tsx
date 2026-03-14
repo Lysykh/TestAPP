@@ -1,13 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  Linking,
   Modal,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import Video from "react-native-video";
 import styles from "./styles";
 
 // Импорт функций расчетов
@@ -89,6 +92,209 @@ const SPORT_TIME_THRESHOLDS = {
 
 const STORAGE_KEY = "@workout_history";
 
+// Улучшенный компонент для отображения видео с обработкой ошибок
+const ExerciseVideo = ({ sportType }: { sportType: string | null }) => {
+  const [videoError, setVideoError] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
+  const videoRef = useRef(null);
+
+  // Определяем URL видео в зависимости от вида спорта
+  const getVideoUrl = () => {
+    const baseUrl = "https://crystal-christmas.ru";
+
+    switch (sportType) {
+      case "run":
+        return `${baseUrl}/video/run.mp4`;
+      case "swim":
+        return `${baseUrl}/video/swim.mp4`;
+      case "bike":
+        return `${baseUrl}/video/bike.mp4`;
+      default:
+        return `${baseUrl}/video/run.mp4`;
+    }
+  };
+
+  const handleVideoError = (error: any) => {
+    console.log("Video error details:", error);
+
+    // Детальная обработка ошибок на основе кодов ошибок
+    const errorCode = error?.error?.code || error?.code;
+    const errorDomain = error?.error?.domain || error?.domain;
+
+    console.log(`Error code: ${errorCode}, Domain: ${errorDomain}`);
+
+    // Определяем понятное сообщение для пользователя
+    if (errorCode === -11800) {
+      setErrorMessage("Формат видео не поддерживается на этом устройстве");
+    } else if (errorCode === -1009 || errorMessage.includes("Internet")) {
+      setErrorMessage("Нет подключения к интернету");
+    } else if (errorCode === -1100) {
+      setErrorMessage("Файл видео не найден на сервере");
+    } else if (errorCode === -1004) {
+      setErrorMessage("Не удалось подключиться к серверу");
+    } else if (errorCode === -1005) {
+      setErrorMessage("Соединение с сервером потеряно");
+    } else {
+      setErrorMessage(`Ошибка загрузки видео (${errorCode || "неизвестная"})`);
+    }
+
+    setVideoError(true);
+    setLoading(false);
+  };
+
+  const handleVideoLoad = () => {
+    console.log("Video loaded successfully");
+    setLoading(false);
+    setVideoError(false);
+    setErrorMessage("");
+    setRetryCount(0); // Сбрасываем счетчик попыток при успешной загрузке
+  };
+
+  const handleVideoBuffer = () => {
+    console.log("Video buffering...");
+  };
+
+  const handleVideoLoadStart = () => {
+    console.log("Video loading started...");
+    setLoading(true);
+  };
+
+  const retryLoadVideo = () => {
+    if (retryCount < 3) {
+      setRetryCount((prev) => prev + 1);
+      setLoading(true);
+      setVideoError(false);
+      setErrorMessage("");
+
+      // Принудительно перезагружаем видео
+      if (videoRef.current) {
+        // @ts-ignore
+        videoRef.current.seek(0);
+      }
+    } else {
+      Alert.alert(
+        "Не удается загрузить видео",
+        "Превышено количество попыток загрузки. Вы можете открыть видео в браузере.",
+        [
+          { text: "Отмена", style: "cancel" },
+          { text: "Открыть в браузере", onPress: openVideoInBrowser },
+        ],
+      );
+    }
+  };
+
+  const openVideoInBrowser = () => {
+    Linking.openURL(getVideoUrl()).catch((err) => {
+      console.error("Failed to open URL:", err);
+      Alert.alert("Ошибка", "Не удалось открыть видео в браузере");
+    });
+  };
+
+  const checkVideoAvailability = async () => {
+    try {
+      const response = await fetch(getVideoUrl(), { method: "HEAD" });
+      if (!response.ok) {
+        console.log(`Video not available: ${response.status}`);
+        setErrorMessage(`Видео временно недоступно (${response.status})`);
+        setVideoError(true);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log("Error checking video availability:", error);
+      // Не устанавливаем ошибку здесь, дадим видео компоненту попробовать загрузиться
+    }
+  };
+
+  useEffect(() => {
+    checkVideoAvailability();
+  }, [sportType]);
+
+  if (videoError) {
+    return (
+      <View style={styles.videoPlaceholder}>
+        <Text style={styles.videoPlaceholderIcon}>📹</Text>
+        <Text style={styles.videoPlaceholderText}>
+          {errorMessage || "Не удалось загрузить видео"}
+        </Text>
+        <Text style={styles.videoPlaceholderSubtext}>
+          Попробуйте повторить попытку или откройте видео в браузере
+        </Text>
+
+        <View style={styles.videoErrorButtonsContainer}>
+          <TouchableOpacity
+            style={[styles.videoErrorButton, styles.retryButton]}
+            onPress={retryLoadVideo}
+            disabled={retryCount >= 3}
+          >
+            <Text style={styles.retryButtonText}>
+              {retryCount >= 3 ? "Попытки исчерпаны" : "Повторить"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.videoErrorButton, styles.browserButton]}
+            onPress={openVideoInBrowser}
+          >
+            <Text style={styles.browserButtonText}>Открыть в браузере</Text>
+          </TouchableOpacity>
+        </View>
+
+        {retryCount > 0 && retryCount < 3 && (
+          <Text style={styles.retryCountText}>Попытка {retryCount} из 3</Text>
+        )}
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.videoContainer}>
+      {loading && (
+        <View style={styles.videoLoadingOverlay}>
+          <ActivityIndicator size="large" color="#4A90E2" />
+          <Text style={styles.videoLoadingText}>Загрузка видео...</Text>
+          {retryCount > 0 && (
+            <Text style={styles.retryCountText}>Попытка {retryCount} из 3</Text>
+          )}
+        </View>
+      )}
+      <Video
+        ref={videoRef}
+        source={{
+          uri: getVideoUrl(),
+          headers: {
+            Accept: "video/mp4,video/*;q=0.9",
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS like Mac OS X)",
+          },
+        }}
+        style={styles.videoPlayer}
+        resizeMode="contain"
+        repeat={true}
+        paused={false}
+        muted={false}
+        volume={1.0}
+        rate={1.0}
+        onLoad={handleVideoLoad}
+        onError={handleVideoError}
+        onBuffer={handleVideoBuffer}
+        onLoadStart={handleVideoLoadStart}
+        bufferConfig={{
+          minBufferMs: 15000,
+          maxBufferMs: 50000,
+          bufferForPlaybackMs: 2500,
+          bufferForPlaybackAfterRebufferMs: 5000,
+        }}
+        progressUpdateInterval={250}
+        playInBackground={false}
+        playWhenInactive={false}
+        ignoreSilentSwitch="ignore"
+        posterResizeMode="cover"
+      />
+    </View>
+  );
+};
+
 const WorckOutMain = ({
   workoutLevel,
   sportType,
@@ -137,7 +343,7 @@ const WorckOutMain = ({
       const savedWorkouts: SavedWorkout[] = stored ? JSON.parse(stored) : [];
 
       const currentDate = new Date().toISOString();
-      const razryad = getSportName(sportType) === "плавание" ? 100 : 1000;
+      const razryad = getSportName(sportType) === "Плавание" ? 100 : 1000;
 
       const totalDuration = selectedTimeSeconds
         ? ((workoutData.distance * workoutData.reps * workoutData.sets) /
@@ -196,7 +402,7 @@ const WorckOutMain = ({
 - Отдых между повторениями: ${secondsToTimeString(workoutData.relaxTemp)} на ${workoutData.relaxDistance}м
 - Отдых между подходами: 60 секунд
 
-Проанализируй данную тренировку с точки зрения профессионального тренер. повтори кажды элемент тренировки и дай одно или два профессиональных комментария. Не более 100 слов`;
+Проанализируй данную тренировку с точки зрения профессионального тренера. Повтори каждый элемент тренировки и дай одно или два профессиональных комментария. Не более 100 слов`;
 
       const response = await fetch(
         `https://crystal-christmas.ru/request_gigachat2/${encodeURIComponent(promptText)}`,
@@ -223,6 +429,16 @@ const WorckOutMain = ({
   const getSportName = (sport: string | null): string => {
     if (!sport) return "не выбран";
     const sports: { [key: string]: string } = {
+      swim: "Плавание",
+      run: "Бег",
+      bike: "Велосипед",
+    };
+    return sports[sport] || sport;
+  };
+
+  const getSportNameWithEmoji = (sport: string | null): string => {
+    if (!sport) return "не выбран";
+    const sports: { [key: string]: string } = {
       swim: "🏊 Плавание",
       run: "🏃 Бег",
       bike: "🚴 Велосипед",
@@ -237,7 +453,7 @@ const WorckOutMain = ({
       green: "Аэробная тренировка. Низкая интенсивность.",
       orange: "Средняя интенсивность. Тренировка ПАНО.",
       red: "Высокая интенсивность. Тренировка МПК.",
-      grey: "серый",
+      grey: "Восстановительная тренировка",
     };
 
     return colorDescriptions[color] || color;
@@ -312,7 +528,7 @@ const WorckOutMain = ({
     );
   }
 
-  const razryad = getSportName(sportType) === "плавание" ? 100 : 1000;
+  const razryad = getSportName(sportType) === "Плавание" ? 100 : 1000;
 
   const totalDuration = selectedTimeSeconds
     ? ((workoutData.distance * workoutData.reps * workoutData.sets) / razryad) *
@@ -334,7 +550,9 @@ const WorckOutMain = ({
         </View>
         <View style={styles.workoutInfoRow}>
           <Text style={styles.workoutInfoLabel}>Спорт:</Text>
-          <Text style={styles.workoutInfoValue}>{getSportName(sportType)}</Text>
+          <Text style={styles.workoutInfoValue}>
+            {getSportNameWithEmoji(sportType)}
+          </Text>
         </View>
         <View style={styles.workoutInfoRow}>
           <Text style={styles.workoutInfoLabel}>Цвет:</Text>
@@ -392,6 +610,29 @@ const WorckOutMain = ({
               </Text>
             </View>
           )}
+        </View>
+      </View>
+
+      {/* НОВЫЙ РАЗДЕЛ: Упражнения с видео */}
+      <View style={styles.workoutSection}>
+        <Text style={styles.workoutSectionTitle}>УПРАЖНЕНИЯ</Text>
+        <Text style={styles.workoutSubtitle}>
+          {getSportNameWithEmoji(sportType)} - демонстрация техники
+        </Text>
+        <ExerciseVideo sportType={sportType} />
+
+        {/* Дополнительная информация об упражнениях */}
+        <View style={styles.workoutExerciseBlock}>
+          <Text style={styles.workoutExerciseLabel}>Рекомендации:</Text>
+          <Text style={styles.workoutExerciseDescription}>
+            • Следите за техникой выполнения
+          </Text>
+          <Text style={styles.workoutExerciseDescription}>
+            • Дышите равномерно
+          </Text>
+          <Text style={styles.workoutExerciseDescription}>
+            • При появлении боли прекратите выполнение
+          </Text>
         </View>
       </View>
 

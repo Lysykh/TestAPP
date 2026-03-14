@@ -66,6 +66,43 @@ export default function HomeScreen() {
     }
   };
 
+  // Функция удаления отдельной тренировки
+  const deleteWorkout = (workoutId: string) => {
+    Alert.alert(
+      "Удалить тренировку",
+      "Вы уверены, что хотите удалить эту тренировку из истории?",
+      [
+        { text: "Отмена", style: "cancel" },
+        {
+          text: "Удалить",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // Фильтруем массив, исключая удаляемую тренировку
+              const updatedWorkouts = savedWorkouts.filter(
+                (w) => w.id !== workoutId,
+              );
+
+              // Сохраняем обновленный массив в AsyncStorage
+              await AsyncStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(updatedWorkouts),
+              );
+
+              // Обновляем состояние
+              setSavedWorkouts(updatedWorkouts);
+
+              Alert.alert("Успешно", "Тренировка удалена из истории");
+            } catch (error) {
+              console.error("Error deleting workout:", error);
+              Alert.alert("Ошибка", "Не удалось удалить тренировку");
+            }
+          },
+        },
+      ],
+    );
+  };
+
   const toggleWorkoutMode = () => {
     setShowWorkoutMain(!showWorkoutMain);
   };
@@ -124,7 +161,7 @@ export default function HomeScreen() {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Компонент для отображения элемента истории
+  // Компонент для отображения элемента истории с серой кнопкой удаления
   const HistoryItem = ({ item }: { item: SavedWorkout }) => {
     const colorInfo = getColorDisplay(item.color);
 
@@ -176,6 +213,15 @@ export default function HomeScreen() {
             </Text>
           </View>
         </View>
+
+        {/* Серая кнопка удаления отдельной тренировки (уменьшенная) */}
+        <TouchableOpacity
+          style={styles.deleteWorkoutButton}
+          onPress={() => deleteWorkout(item.id)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.deleteWorkoutButtonText}>✕</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -284,6 +330,7 @@ export default function HomeScreen() {
                     тренировок
                   </Text>
                 </View>
+
                 <FlatList
                   data={recentWorkouts}
                   keyExtractor={(item) => item.id}

@@ -811,6 +811,201 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+
+  // Добавьте эти стили в объект styles
+
+  // Стили для кнопок удаления в истории
+  deleteWorkoutButton: {
+    backgroundColor: "#E74C3C",
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignSelf: "flex-end",
+    marginTop: 10,
+    minWidth: 100,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+
+  deleteWorkoutButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
+  // Стили для кнопки очистки всей истории
+  clearAllButton: {
+    backgroundColor: "#C0392B",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    marginBottom: 15,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+
+  clearAllButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  deleteWorkoutButton: {
+    backgroundColor: "#95A5A6", // Серый цвет
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "flex-end",
+    marginTop: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+
+  deleteWorkoutButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+    lineHeight: 18,
+  },
+  // Добавьте эти стили в ваш файл styles.ts
+
+  videoContainer: {
+    width: "100%",
+    height: 200,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#f0f0f0",
+    marginVertical: 12,
+  },
+
+  videoPlayer: {
+    width: "100%",
+    height: "100%",
+  },
+
+  videoLoadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+  },
+
+  videoLoadingText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#4A90E2",
+  },
+
+  videoPlaceholder: {
+    width: "100%",
+    height: 200,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderStyle: "dashed",
+  },
+
+  videoPlaceholderIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+    color: "#95A5A6",
+  },
+
+  videoPlaceholderText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#7F8C8D",
+    marginBottom: 4,
+  },
+
+  videoPlaceholderSubtext: {
+    fontSize: 14,
+    color: "#95A5A6",
+  },
+
+  // Добавьте эти стили в соответствующие разделы вашего файла styles.ts
+
+  videoErrorButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 15,
+    gap: 10,
+  },
+
+  videoErrorButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: "center",
+  },
+
+  retryButton: {
+    backgroundColor: "#4A90E2",
+  },
+
+  retryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
+  browserButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#4A90E2",
+  },
+
+  browserButtonText: {
+    color: "#4A90E2",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+
+  retryCountText: {
+    color: "#999",
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: "center",
+  },
+
+  videoPlaceholderSubtext: {
+    color: "#666",
+    fontSize: 12,
+    textAlign: "center",
+    marginTop: 5,
+    paddingHorizontal: 20,
+  },
+
+  workoutExerciseDescription: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4,
+    marginLeft: 8,
+    lineHeight: 20,
+  },
 });
 
 export default styles;
